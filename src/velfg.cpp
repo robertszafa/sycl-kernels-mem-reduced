@@ -15,6 +15,8 @@
   #include "kernel_velfg_reduced.hpp"
 #elif ndrange
   #include "kernel_velfg_ndrange.hpp"
+#elif pipes
+  #include "kernel_velfg_pipes.hpp"
 #else
   #error "At least default reduced should be defined."
 #endif
@@ -156,6 +158,8 @@ int main(int argc, char *argv[]) {
     velfg_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif ndrange
     velfg_ndrange(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+#elif pipes
+    velfg_pipes(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #endif
 
     auto stop = std::clock();
