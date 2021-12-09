@@ -15,7 +15,7 @@ CXXFLAGS += -std=c++17 -O2 -DIP=$(IP) -DJP=$(JP) -D$(KERNEL)
 # CXXFLAGS += -g
 
 SRC := src/velfg.cpp
-HDR := src/kernel_velfg_$(KERNEL).hpp
+HDR := src/kernel_velfg_$(KERNEL).hpp src/velfg_sizes.hpp
 BIN := bin/velfg_$(KERNEL)_$(IP)x$(JP)
 
 .PHONY: host fpga_emu fpga 
