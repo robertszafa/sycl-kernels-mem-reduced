@@ -32,11 +32,11 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
   buffer dy1_buf(dy1);
   buffer dzn_buf(dzn);
   buffer dzs_buf(dzs);
-  // Outout buffers are initialised with non-const host pointer,
+  // Output buffers are initialised with non-const host pointer,
   // which ensures device->host data transfer after buffer goes out of scope.
-  buffer f_buf(f.data(), fgh_range);
-  buffer g_buf(g.data(), fgh_range);
-  buffer h_buf(h.data(), fgh_range);
+  buffer f_buf(f);
+  buffer g_buf(g);
+  buffer h_buf(h);
 
   // Create buffers holding intermediate arrays in global memory.
   buffer<float> cov1_buf(uvw_range), cov2_buf(uvw_range), cov3_buf(uvw_range),
@@ -45,12 +45,8 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
   buffer<float> diu1_buf(uvw_range), diu2_buf(uvw_range), diu3_buf(uvw_range),
       diu4_buf(uvw_range), diu5_buf(uvw_range), diu6_buf(uvw_range), diu7_buf(uvw_range), 
       diu8_buf(uvw_range), diu9_buf(uvw_range);
-  buffer<float> nou1_buf(uvw_range), nou2_buf(uvw_range), nou3_buf(uvw_range),
-      nou4_buf(uvw_range), nou5_buf(uvw_range), nou6_buf(uvw_range), nou7_buf(uvw_range), 
-      nou8_buf(uvw_range), nou9_buf(uvw_range);
-  buffer<float> dfu1_buf(uvw_range), dfv1_buf(uvw_range), dfw1_buf(uvw_range);
 
-
+  // Submit kernels in-order to the same blocking queue.
   q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
     accessor u(u_buf, hnd, read_only);
@@ -61,13 +57,6 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
     accessor dzn(dzn_buf, hnd, read_only);
     accessor dzs(dzs_buf, hnd, read_only);
 
-    accessor nou1(nou1_buf, hnd, write_only);
-    accessor nou2(nou2_buf, hnd, write_only);
-    accessor nou3(nou3_buf, hnd, write_only);
-    accessor nou4(nou4_buf, hnd, write_only);
-    accessor nou5(nou5_buf, hnd, write_only);
-    accessor nou6(nou6_buf, hnd, write_only);
-    accessor nou9(nou9_buf, hnd, write_only);
     accessor diu1(diu1_buf, hnd, write_only);
     accessor diu2(diu2_buf, hnd, write_only);
     accessor diu3(diu3_buf, hnd, write_only);
@@ -86,6 +75,14 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
     // map 76
     hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
       const int global_id = item_id + 1;
+
+      float nou1[U_V_W_ARRAY_SIZE];
+      float nou2[U_V_W_ARRAY_SIZE];
+      float nou3[U_V_W_ARRAY_SIZE];
+      float nou4[U_V_W_ARRAY_SIZE];
+      float nou5[U_V_W_ARRAY_SIZE];
+      float nou6[U_V_W_ARRAY_SIZE];
+      float nou9[U_V_W_ARRAY_SIZE];
 
       const int u0 = 0;
       int i_vel2;
@@ -282,12 +279,13 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
     accessor cov8(cov8_buf, hnd, write_only);
     accessor diu7(diu7_buf, hnd, write_only);
     accessor diu8(diu8_buf, hnd, write_only);
-    accessor nou7(nou7_buf, hnd, write_only);
-    accessor nou8(nou8_buf, hnd, write_only);
 
     // map 133
     hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
       const int global_id = item_id + 1;
+
+      float nou7[U_V_W_ARRAY_SIZE];
+      float nou8[U_V_W_ARRAY_SIZE];
 
       const int u0 = 0;
       int i_vel2;
@@ -370,15 +368,6 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
     accessor dzn(dzn_buf, hnd, read_only);
     accessor dzs(dzs_buf, hnd, read_only);
 
-    accessor nou1(nou1_buf, hnd, read_only);
-    accessor nou2(nou2_buf, hnd, read_only);
-    accessor nou3(nou3_buf, hnd, read_only);
-    accessor nou4(nou4_buf, hnd, read_only);
-    accessor nou5(nou5_buf, hnd, read_only);
-    accessor nou6(nou6_buf, hnd, read_only);
-    accessor nou7(nou7_buf, hnd, read_only);
-    accessor nou8(nou8_buf, hnd, read_only);
-    accessor nou9(nou9_buf, hnd, read_only);
     accessor diu1(diu1_buf, hnd, read_only);
     accessor diu2(diu2_buf, hnd, read_only);
     accessor diu3(diu3_buf, hnd, read_only);
@@ -398,9 +387,6 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
     accessor cov8(cov8_buf, hnd, read_only);
     accessor cov9(cov9_buf, hnd, read_only);
 
-    accessor dfu1(dfu1_buf, hnd, write_only);
-    accessor dfv1(dfv1_buf, hnd, write_only);
-    accessor dfw1(dfw1_buf, hnd, write_only);
     accessor f_1(f_buf, hnd, write_only);
     accessor g_1(g_buf, hnd, write_only);
     accessor h_1(h_buf, hnd, write_only);
@@ -408,6 +394,11 @@ void velfg_ndrange(queue &q, const std::vector<float> &u,
     // map 218
     hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
       const int global_id = item_id + 1;
+
+      float dfu1[U_V_W_ARRAY_SIZE];
+      float dfv1[U_V_W_ARRAY_SIZE];
+      float dfw1[U_V_W_ARRAY_SIZE];
+
       const float vn = 15.83 * 0.000001;
       const int u0 = 0;
       float covx1;
