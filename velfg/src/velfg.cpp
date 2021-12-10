@@ -12,28 +12,24 @@
 #include "velfg_sizes.hpp"
 
 #if reduced
-  #include "kernel_velfg_reduced.hpp"
+#include "kernel_velfg_reduced.hpp"
 #elif ndrange
-  #include "kernel_velfg_ndrange.hpp"
+#include "kernel_velfg_ndrange.hpp"
 #elif pipes
-  #include "kernel_velfg_pipes.hpp"
+#include "kernel_velfg_pipes.hpp"
 #else
-  #error "At least default reduced should be defined."
+#error "At least default reduced should be defined."
 #endif
 
-
 using namespace sycl;
-
-
 
 //************************************
 // Initialize the array from 0 to array_size - 1
 //************************************
-void InitializeArrays(std::vector<float> &u_0, std::vector<float> &v_0,
-                      std::vector<float> &w_0, std::vector<float> &dx1,
-                      std::vector<float> &dy1, std::vector<float> &dzn,
-                      std::vector<float> &dzs_0, std::vector<float> &f_1,
-                      std::vector<float> &g_1, std::vector<float> &h_1) {
+void InitializeArrays(std::vector<float> &u_0, std::vector<float> &v_0, std::vector<float> &w_0,
+                      std::vector<float> &dx1, std::vector<float> &dy1, std::vector<float> &dzn,
+                      std::vector<float> &dzs_0, std::vector<float> &f_1, std::vector<float> &g_1,
+                      std::vector<float> &h_1) {
   // ! Initialisation
   for (unsigned int i = 0; i < DZ_ARRAY_SIZE; ++i) {
     dzn[i] = 1.0;
@@ -97,7 +93,6 @@ void InitializeArrays(std::vector<float> &u_0, std::vector<float> &v_0,
   }
 }
 
-
 // Create an exception handler for asynchronous SYCL exceptions
 static auto exception_handler = [](sycl::exception_list e_list) {
   for (std::exception_ptr const &e : e_list) {
@@ -111,7 +106,6 @@ static auto exception_handler = [](sycl::exception_list e_list) {
     }
   }
 };
-
 
 int main(int argc, char *argv[]) {
   // Create device selector for the device of your interest.
@@ -132,8 +126,7 @@ int main(int argc, char *argv[]) {
     queue q(d_selector, exception_handler, properties);
 
     // Print out the device information used for the kernel code.
-    std::cout << "Running on device: "
-              << q.get_device().get_info<info::device::name>() << "\n";
+    std::cout << "Running on device: " << q.get_device().get_info<info::device::name>() << "\n";
     std::cout << "Domain size: " << DOMAIN_SIZE << "\n";
 
     // host data
@@ -164,8 +157,8 @@ int main(int argc, char *argv[]) {
 
     auto stop = std::clock();
 
-    std::cout << "\nFinished kernel execution in "
-              << 1000.0 * (stop - start) / CLOCKS_PER_SEC << " ms\n";
+    std::cout << "\nFinished kernel execution in " << 1000.0 * (stop - start) / CLOCKS_PER_SEC
+              << " ms\n";
 
     std::cout << f_1[1] << "\n";
     std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";
@@ -178,5 +171,3 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
-
-
