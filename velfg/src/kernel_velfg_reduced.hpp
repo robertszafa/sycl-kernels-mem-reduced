@@ -44,11 +44,11 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
     const accessor dy1_0(dy1_buf, hnd, read_only);
     const accessor dzn_0(dzn_buf, hnd, read_only);
     const accessor dzs_0(dzs_buf, hnd, read_only);
-    // noinit lets the runtime know that the host f, g, h values don't need to be transfered to the
+    // no_init lets the runtime know that the host f, g, h values don't need to be transfered to the
     // device by default they are, e.g. the kernel could end up not overriding all values.
-    accessor f_1(f_buf, hnd, write_only, noinit);
-    accessor g_1(g_buf, hnd, write_only, noinit);
-    accessor h_1(h_buf, hnd, write_only, noinit);
+    accessor f_1(f_buf, hnd, write_only, no_init);
+    accessor g_1(g_buf, hnd, write_only, no_init);
+    accessor h_1(h_buf, hnd, write_only, no_init);
 
     hnd.single_task([=]() {
       const int kp___velfg_map_76_scal = KP;
