@@ -125,20 +125,7 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
       const int s14[] = {183, 352};
       const int s20[] = {198, 212};
 
-      integer, dimension(1 : 5),
-          parameter ::s1 = (/ 33, 1025, 1056, 1057, 1088 /) integer, dimension(1 : 5),
-                    parameter ::s2 = (/ 33, 1025, 1026, 1056, 1057 /) integer, dimension(1 : 4),
-                    parameter ::s3 = (/ 33, 34, 65, 1057 /) integer, dimension(1 : 3),
-                    parameter ::s4 = (/ 1025, 1056, 1057 /) integer, dimension(1 : 2),
-                    parameter ::s5 = (/ 1025, 2049 /) integer, dimension(1 : 2),
-                    parameter ::s6 = (/ 1056, 2080 /) integer, dimension(1 : 2),
-                    parameter ::s7 = (/ 1123, 1124 /) integer, dimension(1 : 2),
-                    parameter ::s8 = (/ 1123, 2212 /) integer, dimension(1 : 2),
-                    parameter ::s9 = (/ 1158, 1159 /) integer, dimension(1 : 2),
-                    parameter ::s12 = (/ 1123, 1156 /) integer, dimension(1 : 2),
-                    parameter ::s15 = (/ 1158, 1192 /)
-
-                        int s_idx_1 = 0;
+      int s_idx_1 = 0;
       int s_idx_2 = 0;
       float svec_f_1_g_1_h_1_17[10];
       float svec_f_1_g_1_h_1_18[10];
@@ -146,7 +133,6 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
       float svec_f_1_g_1_h_1_32[4];
       float svec_f_1_g_1_h_1_33[6];
       float svec_f_1_g_1_h_1_34[4];
-
       int global_id;
 
       for (global_id = 1; global_id < DOMAIN_SIZE; global_id += 1) {
