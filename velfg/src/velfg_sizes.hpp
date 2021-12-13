@@ -1,7 +1,5 @@
 #pragma once 
 
-// Provide these as preprocessor macro because aoc is not happy with the inlined
-// functions when the result is used as an array index.
 constexpr unsigned int F1D2C(unsigned int i_lb, unsigned int ix) {
   return (ix - i_lb);
 }

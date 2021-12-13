@@ -1,3 +1,4 @@
+#include "CL/sycl/properties/accessor_properties.hpp"
 #include <CL/sycl.hpp>
 #include <iostream>
 #include <vector>
@@ -177,6 +178,7 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
   buffer f_buf(f);
   buffer g_buf(g);
   buffer h_buf(h);
+
 
   //////////////////////////////
   // memory read
@@ -532,9 +534,9 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
     accessor dzn(dzn_buf, hnd, read_only);
     accessor dzs(dzs_buf, hnd, read_only);
 
-    accessor f(f_buf, hnd, write_only);
-    accessor g(g_buf, hnd, write_only);
-    accessor h(h_buf, hnd, write_only);
+    accessor f(f_buf, hnd, write_only, no_init);
+    accessor g(g_buf, hnd, write_only, no_init);
+    accessor h(h_buf, hnd, write_only, no_init);
 
     hnd.single_task([=]() {
       const float vn = 15.83 * 0.000001;

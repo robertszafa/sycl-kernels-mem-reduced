@@ -54,20 +54,20 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     accessor dzn(dzn_buf, hnd, read_only);
     accessor dzs(dzs_buf, hnd, read_only);
 
-    accessor diu1(diu1_buf, hnd, write_only);
-    accessor diu2(diu2_buf, hnd, write_only);
-    accessor diu3(diu3_buf, hnd, write_only);
-    accessor diu4(diu4_buf, hnd, write_only);
-    accessor diu5(diu5_buf, hnd, write_only);
-    accessor diu6(diu6_buf, hnd, write_only);
-    accessor diu9(diu9_buf, hnd, write_only);
-    accessor cov1(cov1_buf, hnd, write_only);
-    accessor cov2(cov2_buf, hnd, write_only);
-    accessor cov3(cov3_buf, hnd, write_only);
-    accessor cov4(cov4_buf, hnd, write_only);
-    accessor cov5(cov5_buf, hnd, write_only);
-    accessor cov6(cov6_buf, hnd, write_only);
-    accessor cov9(cov9_buf, hnd, write_only);
+    accessor diu1(diu1_buf, hnd, write_only, no_init);
+    accessor diu2(diu2_buf, hnd, write_only, no_init);
+    accessor diu3(diu3_buf, hnd, write_only, no_init);
+    accessor diu4(diu4_buf, hnd, write_only, no_init);
+    accessor diu5(diu5_buf, hnd, write_only, no_init);
+    accessor diu6(diu6_buf, hnd, write_only, no_init);
+    accessor diu9(diu9_buf, hnd, write_only, no_init);
+    accessor cov1(cov1_buf, hnd, write_only, no_init);
+    accessor cov2(cov2_buf, hnd, write_only, no_init);
+    accessor cov3(cov3_buf, hnd, write_only, no_init);
+    accessor cov4(cov4_buf, hnd, write_only, no_init);
+    accessor cov5(cov5_buf, hnd, write_only, no_init);
+    accessor cov6(cov6_buf, hnd, write_only, no_init);
+    accessor cov9(cov9_buf, hnd, write_only, no_init);
 
     // map 76
     hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
@@ -236,10 +236,10 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     accessor dy1(dy1_buf, hnd, read_only);
     accessor dzn(dzn_buf, hnd, read_only);
 
-    accessor cov7(cov7_buf, hnd, write_only);
-    accessor cov8(cov8_buf, hnd, write_only);
-    accessor diu7(diu7_buf, hnd, write_only);
-    accessor diu8(diu8_buf, hnd, write_only);
+    accessor cov7(cov7_buf, hnd, write_only, no_init);
+    accessor cov8(cov8_buf, hnd, write_only, no_init);
+    accessor diu7(diu7_buf, hnd, write_only, no_init);
+    accessor diu8(diu8_buf, hnd, write_only, no_init);
 
     // map 133
     hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
@@ -332,9 +332,9 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     accessor cov8(cov8_buf, hnd, read_only);
     accessor cov9(cov9_buf, hnd, read_only);
 
-    accessor f_1(f_buf, hnd, write_only);
-    accessor g_1(g_buf, hnd, write_only);
-    accessor h_1(h_buf, hnd, write_only);
+    accessor f_1(f_buf, hnd, write_only, no_init);
+    accessor g_1(g_buf, hnd, write_only, no_init);
+    accessor h_1(h_buf, hnd, write_only, no_init);
 
     // map 218
     hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {

@@ -44,23 +44,20 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
     const accessor dy1_0(dy1_buf, hnd, read_only);
     const accessor dzn_0(dzn_buf, hnd, read_only);
     const accessor dzs_0(dzs_buf, hnd, read_only);
-    accessor f_1(f_buf, hnd, write_only);
-    accessor g_1(g_buf, hnd, write_only);
-    accessor h_1(h_buf, hnd, write_only);
+    // noinit lets the runtime know that the host f, g, h values don't need to be transfered to the
+    // device by default they are, e.g. the kernel could end up not overriding all values.
+    accessor f_1(f_buf, hnd, write_only, noinit);
+    accessor g_1(g_buf, hnd, write_only, noinit);
+    accessor h_1(h_buf, hnd, write_only, noinit);
 
     hnd.single_task([=]() {
-      const int ip___velfg_map_76_scal = 10;
-      const int jp___velfg_map_76_scal = 10;
-      const int kp___velfg_map_76_scal = 90;
+      const int kp___velfg_map_76_scal = KP;
       const int u0___velfg_map_76_scal = 0;
-      const int ip___velfg_map_133_scal = 10;
-      const int jp___velfg_map_133_scal = 10;
-      const int kp___velfg_map_133_scal = 90;
+      const int kp___velfg_map_133_scal = KP;
       const int u0___velfg_map_133_scal = 0;
-      const int ip___velfg_map_218_scal = 10;
-      const int jp___velfg_map_218_scal = 10;
-      const int kp___velfg_map_218_scal = 90;
+      const int kp___velfg_map_218_scal = KP;
       const float vn___velfg_map_218_scal = 15.83 * 0.000001;
+
       float covx1___velfg_map_218_scal = 0;
       int i___velfg_map_218_scal = 0;
       int j___velfg_map_218_scal = 0;
@@ -77,13 +74,11 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
       float dfu1___velfg_map_218 = 0;
       float dfv1___velfg_map_218 = 0;
       float dfw1___velfg_map_218 = 0;
-
       float nou7___velfg_map_133 = 0;
       float diu7___velfg_map_133 = 0;
       float nou8___velfg_map_133 = 0;
       float diu8___velfg_map_133 = 0;
       int i___f_maps_f_1_g_1_h_1_1 = 0;
-
       float nou1___velfg_map_76 = 0;
       float diu1___velfg_map_76 = 0;
       float nou5___velfg_map_76 = 0;
@@ -118,25 +113,40 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
       float diu8_s_0___f_comp_f_1____6399bded[2];
       float diu9_s_0___f_comp_f_1____cb19f377[2];
 
-      const int s8[] = {198, 199};
-      const int s3[] = {13, 145, 156, 157, 168};
-      float svec_f_1_g_1_h_1_17[10];
-      int s_idx_1 = 0;
-      int s_idx_2 = 0;
-      const int s2[] = {13, 145, 146, 156, 157};
-      float svec_f_1_g_1_h_1_18[10];
       const int s1[] = {13, 14, 25, 157};
-      float svec_f_1_g_1_h_1_19[8];
-      const int s7[] = {183, 196};
-      const int s14[] = {183, 352};
-      const int s11[] = {183, 184};
-      const int s20[] = {198, 212};
+      const int s2[] = {13, 145, 146, 156, 157};
+      const int s3[] = {13, 145, 156, 157, 168};
       const int s4[] = {156, 300};
-      float svec_f_1_g_1_h_1_32[4];
-      const int s6[] = {145, 156, 157};
-      float svec_f_1_g_1_h_1_33[6];
       const int s5[] = {145, 289};
+      const int s6[] = {145, 156, 157};
+      const int s7[] = {183, 196};
+      const int s8[] = {198, 199};
+      const int s11[] = {183, 184};
+      const int s14[] = {183, 352};
+      const int s20[] = {198, 212};
+
+      integer, dimension(1 : 5),
+          parameter ::s1 = (/ 33, 1025, 1056, 1057, 1088 /) integer, dimension(1 : 5),
+                    parameter ::s2 = (/ 33, 1025, 1026, 1056, 1057 /) integer, dimension(1 : 4),
+                    parameter ::s3 = (/ 33, 34, 65, 1057 /) integer, dimension(1 : 3),
+                    parameter ::s4 = (/ 1025, 1056, 1057 /) integer, dimension(1 : 2),
+                    parameter ::s5 = (/ 1025, 2049 /) integer, dimension(1 : 2),
+                    parameter ::s6 = (/ 1056, 2080 /) integer, dimension(1 : 2),
+                    parameter ::s7 = (/ 1123, 1124 /) integer, dimension(1 : 2),
+                    parameter ::s8 = (/ 1123, 2212 /) integer, dimension(1 : 2),
+                    parameter ::s9 = (/ 1158, 1159 /) integer, dimension(1 : 2),
+                    parameter ::s12 = (/ 1123, 1156 /) integer, dimension(1 : 2),
+                    parameter ::s15 = (/ 1158, 1192 /)
+
+                        int s_idx_1 = 0;
+      int s_idx_2 = 0;
+      float svec_f_1_g_1_h_1_17[10];
+      float svec_f_1_g_1_h_1_18[10];
+      float svec_f_1_g_1_h_1_19[8];
+      float svec_f_1_g_1_h_1_32[4];
+      float svec_f_1_g_1_h_1_33[6];
       float svec_f_1_g_1_h_1_34[4];
+
       int global_id;
 
       for (global_id = 1; global_id < DOMAIN_SIZE; global_id += 1) {
