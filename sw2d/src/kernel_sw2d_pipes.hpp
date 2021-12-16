@@ -29,18 +29,9 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
   buffer vn_buf(vn);
 
   // Pipe declarations.
-  using u_pipe = pipe<class u_pipe_class, float>;
-  using v_pipe = pipe<class v_pipe_class, float>;
-  using h_pipe = pipe<class h_pipe_class, float>;
-  using eta_pipe = pipe<class eta_pipe_class, float>;
-  using wet_pipe = pipe<class wet_pipe_class, int>;
-
   using eta_pipe_j_k = pipe<class eta_pipe_j_k_class, float>;
   using eta_pipe_jp1_k = pipe<class eta_pipe_jp1_k_class, float>;
   using eta_pipe_j_kp1 = pipe<class eta_pipe_j_kp1_class, float>;
-
-  using du___dyn_pipe_j_k = pipe<class du___dyn_pipe_j_k_class, float>;
-  using dv___dyn_pipe_j_k = pipe<class dv___dyn_pipe_j_k_class, float>;
 
   using wet_pipe_j_k = pipe<class wet_pipe_j_k_class, int>;
   using wet_pipe_j_kp1 = pipe<class wet_pipe_j_kp1_class, int>;
@@ -65,58 +56,51 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
   using etan_pipe = pipe<class etan_pipe_class, float>;
   using wet_pipe_2 = pipe<class wet_pipe_2_class, int>;
 
-  using wet_pipe_2_j_k = pipe<class wet_pipe_2_j_k_class, float>;
-  using wet_pipe_2_j_kp1 = pipe<class wet_pipe_2_j_kp1_class, float>;
-  using wet_pipe_2_jp1_k = pipe<class wet_pipe_2_jp1_k_class, float>;
-  using wet_pipe_2_j_km1 = pipe<class wet_pipe_2_j_km1_class, float>;
-  using wet_pipe_2_jm1_k = pipe<class wet_pipe_2_jm1_k_class, float>;
+  using wet_pipe_2_j_k = pipe<class wet_pipe_2_j_k_class, int>;
+  using wet_pipe_2_j_kp1 = pipe<class wet_pipe_2_j_kp1_class, int>;
+  using wet_pipe_2_jp1_k = pipe<class wet_pipe_2_jp1_k_class, int>;
+  using wet_pipe_2_j_km1 = pipe<class wet_pipe_2_j_km1_class, int>;
+  using wet_pipe_2_jm1_k = pipe<class wet_pipe_2_jm1_k_class, int>;
   using etan_pipe_j_k = pipe<class etan_pipe_j_k_class, float>;
   using etan_pipe_j_kp1 = pipe<class etan_pipe_j_kp1_class, float>;
   using etan_pipe_jp1_k = pipe<class etan_pipe_jp1_k_class, float>;
   using etan_pipe_j_km1 = pipe<class etan_pipe_j_km1_class, float>;
   using etan_pipe_jm1_k = pipe<class etan_pipe_jm1_k_class, float>;
 
+
   q.submit([&](handler &hnd) {
     accessor wet(wet_buf, hnd, read_only);
     accessor eta(eta_buf, hnd, read_only);
-    accessor u(u_buf, hnd, read_only);
-    accessor v(v_buf, hnd, read_only);
-    accessor h(h_buf, hnd, read_only);
 
-    hnd.single_task<class memrd>([=]() {
-      for (int i = 0; i < ARRAY_SIZE; ++i) {
-        u_pipe::write(u[i]);
-        v_pipe::write(v[i]);
-        h_pipe::write(h[i]);
-        eta_pipe::write(eta[i]);
-        wet_pipe::write(wet[i]);
-      }
-    });
-  });
-
-  q.submit([&](handler &hnd) {
-    hnd.single_task<class eta_smache>([=]() {
+    hnd.single_task<class wet_eta_smache>([=]() {
       constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
       constexpr uint REACH_NEG = 0;
       constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
 
       // Store the stencil reach + the current i_j_k element
+      float wet_buffer[STENCIL_REACH + 1];
       float eta_buffer[STENCIL_REACH + 1];
 
-      for (int count = 0; count < (ARRAY_SIZE + STENCIL_REACH); count++) {
-// SHIFT-RIGHT register for the buffers TODO: Probably no need for this pragma.
+      for (int idx = 0; idx < (DOMAIN_SIZE + STENCIL_REACH); idx++) {
+// SHIFT-RIGHT register for the buffers
+// TODO: Probably no need for this pragma.
 #pragma unroll
         for (int i = 0; i < STENCIL_REACH; ++i) {
+          wet_buffer[i] = wet_buffer[i + 1];
           eta_buffer[i] = eta_buffer[i + 1];
         }
 
-        if (count < DOMAIN_SIZE) {
-          eta_buffer[STENCIL_REACH] = eta_pipe::read();
+        if (idx < DOMAIN_SIZE) {
+          wet_buffer[STENCIL_REACH] = wet[idx + IDX_1_1];
+          eta_buffer[STENCIL_REACH] = eta[idx + IDX_1_1];
         }
 
         // start emitting once all data covered by the stencil reach is read into the buffer
         constexpr uint IDX_J_K = REACH_NEG;
-        if (count >= STENCIL_REACH) {
+        if (idx >= STENCIL_REACH) {
+          wet_pipe_j_k::write(wet_buffer[IDX_J_K]);
+          wet_pipe_j_kp1::write(wet_buffer[IDX_J_K + OFFSET_J_KP1]);
+          wet_pipe_jp1_k::write(wet_buffer[IDX_J_K + OFFSET_JP1_K]);
           eta_pipe_j_k::write(eta_buffer[IDX_J_K]);
           eta_pipe_j_kp1::write(eta_buffer[IDX_J_K + OFFSET_J_KP1]);
           eta_pipe_jp1_k::write(eta_buffer[IDX_J_K + OFFSET_JP1_K]);
@@ -126,65 +110,27 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
   });
 
   q.submit([&](handler &hnd) {
-    hnd.single_task<class map49>([=]() {
-      for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
+    accessor u(u_buf, hnd, read_only);
+    accessor v(v_buf, hnd, read_only);
+
+    accessor un(un_buf, hnd, write_only, no_init);
+    accessor vn(vn_buf, hnd, write_only, no_init);
+
+    hnd.single_task<class map49_55>([=]() {
+      for (int global_id = IDX_1_1; global_id < DOMAIN_SIZE; ++global_id) {
         auto eta_j_k = eta_pipe_j_k::read();
         auto eta_j_kp1 = eta_pipe_j_kp1::read();
         auto eta_jp1_k = eta_pipe_jp1_k::read();
 
-        du___dyn_pipe_j_k::write(-dt * g * (eta_j_kp1 - eta_j_k) / dx);
-        dv___dyn_pipe_j_k::write(-dt * g * (eta_jp1_k - eta_j_k) / dy);
-
-        eta_pipe_j_k_2::write(eta_j_k);
-      }
-    });
-  });
-
-  q.submit([&](handler &hnd) {
-    hnd.single_task<class wet_smache>([=]() {
-      constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
-      constexpr uint REACH_NEG = 0;
-      constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
-
-      // Store the stencil reach + the current i_j_k element
-      float wet_buffer[STENCIL_REACH + 1];
-
-      for (int count = 0; count < (ARRAY_SIZE + STENCIL_REACH); count++) {
-// SHIFT-RIGHT register for the buffers
-// TODO: Probably no need for this pragma.
-#pragma unroll
-        for (int i = 0; i < STENCIL_REACH; ++i) {
-          wet_buffer[i] = wet_buffer[i + 1];
-        }
-
-        if (count < DOMAIN_SIZE) {
-          wet_buffer[STENCIL_REACH] = wet_pipe::read();
-        }
-
-        // start emitting once all data covered by the stencil reach is read into the buffer
-        constexpr uint IDX_J_K = REACH_NEG;
-        if (count >= STENCIL_REACH) {
-          wet_pipe_j_k::write(wet_buffer[IDX_J_K]);
-          wet_pipe_j_kp1::write(wet_buffer[IDX_J_K + OFFSET_J_KP1]);
-          wet_pipe_jp1_k::write(wet_buffer[IDX_J_K + OFFSET_JP1_K]);
-        }
-      }
-    });
-  });
-
-  q.submit([&](handler &hnd) {
-    accessor un(un_buf, hnd, write_only, no_init);
-    accessor vn(vn_buf, hnd, write_only, no_init);
-
-    hnd.single_task<class map55>([=]() {
-      for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
         auto wet_j_k = wet_pipe_j_k::read();
         auto wet_jp1_k = wet_pipe_jp1_k::read();
         auto wet_j_kp1 = wet_pipe_j_kp1::read();
-        auto du___dyn_j_k = du___dyn_pipe_j_k::read();
-        auto dv___dyn_j_k = dv___dyn_pipe_j_k::read();
-        auto u_j_k = u_pipe::read();
-        auto v_j_k = v_pipe::read();
+
+        auto u_j_k = u[global_id];
+        auto v_j_k = v[global_id];
+
+        auto du___dyn_j_k = -dt * g * (eta_j_kp1 - eta_j_k) / dx;
+        auto dv___dyn_j_k = -dt * g * (eta_jp1_k - eta_j_k) / dy;
 
         float un_j_k = 0.0;
         if (wet_j_k == 1) {
@@ -214,6 +160,8 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
   });
 
   q.submit([&](handler &hnd) {
+    accessor h(h_buf, hnd, read_only);
+
     hnd.single_task<class h_smache>([=]() {
       constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
       constexpr uint REACH_NEG = std::max(OFFSET_J_KM1, OFFSET_JM1_K);
@@ -222,7 +170,7 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
       // Store the stencil reach + the current i_j_k element
       float h_buffer[STENCIL_REACH + 1];
 
-      for (int count = 0; count < (ARRAY_SIZE + STENCIL_REACH); count++) {
+      for (int idx = 0; idx < (ARRAY_SIZE + STENCIL_REACH); idx++) {
 // SHIFT-RIGHT register for the buffers
 // TODO: Probably no need for this pragma.
 #pragma unroll
@@ -230,13 +178,13 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
           h_buffer[i] = h_buffer[i + 1];
         }
 
-        if (count < DOMAIN_SIZE) {
-          h_buffer[STENCIL_REACH] = h_pipe::read();
+        if (idx < ARRAY_SIZE) {
+          h_buffer[STENCIL_REACH] = h[idx];
         }
 
         // start emitting once all data covered by the stencil reach is read into the buffer
         constexpr uint IDX_J_K = REACH_NEG;
-        if (count >= STENCIL_REACH) {
+        if (idx >= STENCIL_REACH) {
           h_pipe_j_k::write(h_buffer[IDX_J_K]);
           h_pipe_j_kp1::write(h_buffer[IDX_J_K + OFFSET_J_KP1]);
           h_pipe_jp1_k::write(h_buffer[IDX_J_K + OFFSET_JP1_K]);
@@ -257,7 +205,7 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
       float vn_buffer[STENCIL_REACH + 1];
       float un_buffer[STENCIL_REACH + 1];
 
-      for (int count = 0; count < (ARRAY_SIZE + STENCIL_REACH); count++) {
+      for (int idx = 0; idx < (DOMAIN_SIZE + STENCIL_REACH); idx++) {
 // SHIFT-RIGHT register for the buffers
 // TODO: Probably no need for this pragma.
 #pragma unroll
@@ -266,14 +214,19 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
           un_buffer[i] = un_buffer[i + 1];
         }
 
-        if (count < DOMAIN_SIZE) {
+        if (idx >= IDX_1_1 && idx < DOMAIN_SIZE) {
           vn_buffer[STENCIL_REACH] = vn_pipe::read();
           un_buffer[STENCIL_REACH] = un_pipe::read();
+        }
+        else if (idx < IDX_1_1) {
+          // Anything before un(1, 1) is read as 0 in original fortran code.
+          vn_buffer[STENCIL_REACH] = 0;
+          un_buffer[STENCIL_REACH] = 0;
         }
 
         // start emitting once all data covered by the stencil reach is read into the buffer
         constexpr uint IDX_J_K = REACH_NEG;
-        if (count >= STENCIL_REACH) {
+        if (idx >= STENCIL_REACH) {
           vn_pipe_j_k::write(vn_buffer[IDX_J_K]);
           vn_pipe_j_km1::write(vn_buffer[IDX_J_K - OFFSET_J_KM1]);
           vn_pipe_jm1_k::write(vn_buffer[IDX_J_K - OFFSET_JM1_K]);
@@ -288,7 +241,7 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
 
   q.submit([&](handler &hnd) {
     hnd.single_task<class map75>([=]() {
-      for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
+      for (int global_id = IDX_1_1; global_id < DOMAIN_SIZE; ++global_id) {
         auto h_j_k = h_pipe_j_k::read();
         auto h_j_kp1 = h_pipe_j_kp1::read();
         auto h_jp1_k = h_pipe_jp1_k::read();
@@ -324,63 +277,45 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
   });
 
   q.submit([&](handler &hnd) {
-    hnd.single_task<class wet_2_smache>([=]() {
+    accessor wet(wet_buf, hnd, read_only);
+    accessor eta(eta_buf, hnd, read_only);
+
+    hnd.single_task<class etan_wet_2_smache>([=]() {
       constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
       constexpr uint REACH_NEG = std::max(OFFSET_J_KM1, OFFSET_JM1_K);
       constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
 
       // Store the stencil reach + the current i_j_k element
       float wet_buffer[STENCIL_REACH + 1];
+      float etan_buffer[STENCIL_REACH + 1];
 
-      for (int count = 0; count < (ARRAY_SIZE + STENCIL_REACH); count++) {
+      for (int idx = 0; idx < (ARRAY_SIZE + STENCIL_REACH); idx++) {
 // SHIFT-RIGHT register for the buffers
 // TODO: Probably no need for this pragma.
 #pragma unroll
         for (int i = 0; i < STENCIL_REACH; ++i) {
           wet_buffer[i] = wet_buffer[i + 1];
+          etan_buffer[i] = etan_buffer[i + 1];
         }
 
-        if (count < DOMAIN_SIZE) {
+        if (idx >= IDX_1_1 && idx < ARRAY_SIZE) {
           wet_buffer[STENCIL_REACH] = wet_pipe_2::read();
+          etan_buffer[STENCIL_REACH] = etan_pipe::read();
+        }
+        else if (idx < IDX_1_1) {
+          wet_buffer[STENCIL_REACH] = wet[idx];
+          etan_buffer[STENCIL_REACH] = eta[idx];
         }
 
         // start emitting once all data covered by the stencil reach is read into the buffer
         constexpr uint IDX_J_K = REACH_NEG;
-        if (count >= STENCIL_REACH) {
+        if (idx >= STENCIL_REACH) {
           wet_pipe_2_j_k::write(wet_buffer[IDX_J_K]);
           wet_pipe_2_j_kp1::write(wet_buffer[IDX_J_K + OFFSET_J_KP1]);
           wet_pipe_2_jp1_k::write(wet_buffer[IDX_J_K + OFFSET_JP1_K]);
           wet_pipe_2_j_km1::write(wet_buffer[IDX_J_K - OFFSET_J_KM1]);
           wet_pipe_2_jm1_k::write(wet_buffer[IDX_J_K - OFFSET_JM1_K]);
-        }
-      }
-    });
-  });
 
-  q.submit([&](handler &hnd) {
-    hnd.single_task<class etan_smache>([=]() {
-      constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
-      constexpr uint REACH_NEG = std::max(OFFSET_J_KM1, OFFSET_JM1_K);
-      constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
-
-      // Store the stencil reach + the current i_j_k element
-      float etan_buffer[STENCIL_REACH + 1];
-
-      for (int count = 0; count < (ARRAY_SIZE + STENCIL_REACH); count++) {
-// SHIFT-RIGHT register for the buffers
-// TODO: Probably no need for this pragma.
-#pragma unroll
-        for (int i = 0; i < STENCIL_REACH; ++i) {
-          etan_buffer[i] = etan_buffer[i + 1];
-        }
-
-        if (count < DOMAIN_SIZE) {
-          etan_buffer[STENCIL_REACH] = etan_pipe::read();
-        }
-
-        // start emitting once all data covered by the stencil reach is read into the buffer
-        constexpr uint IDX_J_K = REACH_NEG;
-        if (count >= STENCIL_REACH) {
           etan_pipe_j_k::write(etan_buffer[IDX_J_K]);
           etan_pipe_j_kp1::write(etan_buffer[IDX_J_K + OFFSET_J_KP1]);
           etan_pipe_jp1_k::write(etan_buffer[IDX_J_K + OFFSET_JP1_K]);
@@ -395,7 +330,7 @@ void sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float> 
     accessor etann(etann_buf, hnd, write_only, no_init);
 
     hnd.single_task<class map92>([=]() {
-      for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
+      for (int global_id = IDX_1_1; global_id < DOMAIN_SIZE; ++global_id) {
         auto wet_j_k = wet_pipe_2_j_k::read();
         auto wet_j_kp1 = wet_pipe_2_j_kp1::read();
         auto wet_jp1_k = wet_pipe_2_jp1_k::read();

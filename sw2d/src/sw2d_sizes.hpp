@@ -41,10 +41,11 @@ constexpr float dx = 10.0;
 constexpr float dy = 10.0;
 constexpr float eps = 0.05;
 
-/// These are absolute values
-constexpr unsigned int OFFSET_J_KP1 = F2D2C(ARRAY_NY, 0, 0, 1, 2) - F2D2C(ARRAY_NY, 0, 0, 1, 1);
-constexpr unsigned int OFFSET_JP1_K = F2D2C(ARRAY_NY, 0, 0, 2, 1) - F2D2C(ARRAY_NY, 0, 0, 1, 1);
-constexpr unsigned int OFFSET_J_KM1 = F2D2C(ARRAY_NY, 0, 0, 1, 1) - F2D2C(ARRAY_NY, 0, 0, 1, 0);
-constexpr unsigned int OFFSET_JM1_K = F2D2C(ARRAY_NY, 0, 0, 1, 1) - F2D2C(ARRAY_NY, 0, 0, 0, 1);
+constexpr unsigned int IDX_1_1 = F2D2C(ARRAY_NY, 0, 0, 1, 1);
 
+/// These are absolute values
+constexpr unsigned int OFFSET_J_KP1 = F2D2C(ARRAY_NY, 0, 0, 1, 2) - IDX_1_1;
+constexpr unsigned int OFFSET_JP1_K = F2D2C(ARRAY_NY, 0, 0, 2, 1) - IDX_1_1;
+constexpr unsigned int OFFSET_J_KM1 = F2D2C(ARRAY_NY, 0, 0, 1, 1) - IDX_1_1;
+constexpr unsigned int OFFSET_JM1_K = F2D2C(ARRAY_NY, 0, 0, 1, 1) - IDX_1_1;
 
