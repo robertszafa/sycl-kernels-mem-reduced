@@ -4,7 +4,7 @@
 #include <vector>
 
 #if FPGA || FPGA_EMULATOR
-#include <CL/sycl/INTEL/fpga_extensions.hpp>
+#include <sycl/ext/intel/fpga_extensions.hpp>
 #endif
 
 #include "sw2d_sizes.hpp"

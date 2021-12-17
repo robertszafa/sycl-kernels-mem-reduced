@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 constexpr unsigned int F1D2C(unsigned int i_lb, unsigned int ix) { return (ix - i_lb); }
 constexpr unsigned int F2D2C(unsigned int i_rng, unsigned int i_lb, unsigned int j_lb,
                              unsigned int ix, unsigned int jx) {
