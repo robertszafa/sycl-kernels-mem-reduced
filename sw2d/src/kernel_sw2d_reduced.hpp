@@ -90,6 +90,18 @@ void sw2d_reduced(queue &q, const std::vector<int> &wet, const std::vector<float
         const int s1[] = {503, 504, 1005};
         const int s3[] = {1, 503};
         const int s5[] = {1, 502, 503, 504, 1005};
+    #elif NX==1000 && NY==1000
+        const int s1[] = {1003, 1004, 2005};
+        const int s3[] = {1, 1003};
+        const int s5[] = {1, 1002, 1003, 1004, 2005};
+    #elif NX==2000 && NY==2000
+        const int s1[] = {2003, 2004, 4005};
+        const int s3[] = {1, 2003};
+        const int s5[] = {1, 2002, 2003, 2004, 4005};
+    #elif NX==4000 && NY==4000
+        const int s1[] = {4003, 4004, 8005};
+        const int s3[] = {1, 4003};
+        const int s5[] = {1, 4002, 4003, 4004, 8005};
     #else
         #error "Domain size not supported (the stencil offsets come hardcoded from our toolchain)."
     #endif
