@@ -103,7 +103,7 @@ void sw2d_reduced(queue &q, const std::vector<int> &wet, const std::vector<float
         const int s3[] = {1, 4003};
         const int s5[] = {1, 4002, 4003, 4004, 8005};
     #else
-        #error "Domain size not supported (the stencil offsets come hardcoded from our toolchain)."
+        #error "Domain size not generated (the stencil offsets come hardcoded from our toolchain)."
     #endif
 
         int s_idx_1;

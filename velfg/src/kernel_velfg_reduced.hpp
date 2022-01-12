@@ -113,17 +113,45 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
       float diu8_s_0___f_comp_f_1____6399bded[2];
       float diu9_s_0___f_comp_f_1____cb19f377[2];
 
+#if IP == 10 && JP == 10
       const int s1[] = {13, 14, 25, 157};
       const int s2[] = {13, 145, 146, 156, 157};
       const int s3[] = {13, 145, 156, 157, 168};
       const int s4[] = {156, 300};
       const int s5[] = {145, 289};
       const int s6[] = {145, 156, 157};
-      const int s7[] = {183, 196};
       const int s8[] = {198, 199};
       const int s11[] = {183, 184};
-      const int s14[] = {183, 352};
-      const int s20[] = {198, 212};
+#elif IP == 100 && JP == 100
+      const int s1[] = {103,104,205,10507};
+      const int s2[] = {103,10405,10406,10506,10507};
+      const int s3[] = {103,10405,10506,10507,10608};
+      const int s4[] = {10506,20910};
+      const int s5[] = {10405,20809};
+      const int s6[] = {10405,10506,10507};
+      const int s8[] = {10818,10819};
+      const int s11[] = {10713,10714};
+#elif IP == 200 && JP == 200
+      const int s1[] = {203,204,405,41007};
+      const int s2[] = {203,40805,40806,41006,41007};
+      const int s3[] = {203,40805,41006,41007,41208};
+      const int s4[] = {41006,81810};
+      const int s5[] = {40805,81609};
+      const int s6[] = {40805,41006,41007};
+      const int s8[] = {41618,41619};
+      const int s11[] = {41413,41414};
+#elif IP == 300 && JP == 300
+      const int s1[] = {303,304,605,91507};
+      const int s2[] = {303,91205,91206,91506,91507};
+      const int s3[] = {303,91205,91506,91507,91808};
+      const int s4[] = {91506,182710};
+      const int s5[] = {91205,182409};
+      const int s6[] = {91205,91506,91507};
+      const int s8[] = {92418,92419};
+      const int s11[] = {92113,92114};
+#else
+    #error "Domain size not generated (the stencil offsets come hardcoded from our toolchain)."
+#endif
 
       int s_idx_1 = 0;
       int s_idx_2 = 0;
