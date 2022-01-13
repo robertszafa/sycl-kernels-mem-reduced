@@ -36,7 +36,7 @@ constexpr unsigned int F4D2C(unsigned int i_rng, unsigned int j_rng,
 #endif
 
 
-constexpr unsigned int DOMAIN_SIZE = IP * JP * KP;
+constexpr unsigned int DOMAIN_SIZE = (unsigned int) IP * (unsigned int) JP * (unsigned int) KP;
 
 constexpr unsigned int DX_ARRAY_SIZE = IP + 3;
 constexpr unsigned int DY_ARRAY_SIZE = JP + 2;

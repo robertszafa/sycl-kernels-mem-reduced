@@ -26,7 +26,7 @@ constexpr unsigned int F4D2C(unsigned int i_rng, unsigned int j_rng, unsigned in
 #define NY 500
 #endif
 
-constexpr unsigned int DOMAIN_SIZE = NX * NY;
+constexpr unsigned int DOMAIN_SIZE = (unsigned int) NX * (unsigned int) NY;
 
 /// Covers domain plus halo points.
 constexpr unsigned int ARRAY_NX = (NX + 2);
