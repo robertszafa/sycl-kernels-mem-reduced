@@ -6,7 +6,7 @@ ifndef JP
 JP := 10
 endif
 ifndef KERNEL
-KERNEL := reduced
+KERNEL := swi_reduced
 endif
 
 

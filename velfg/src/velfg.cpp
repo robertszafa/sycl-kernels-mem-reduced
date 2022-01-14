@@ -11,8 +11,12 @@
 
 #include "velfg_sizes.hpp"
 
-#if reduced
-#include "kernel_velfg_reduced.hpp"
+#if swi_reduced
+#include "kernel_velfg_swi_reduced.hpp"
+#elif swi
+#include "kernel_velfg_swi.hpp"
+#elif ndrange_reduced
+#include "kernel_velfg_ndrange_reduced.hpp"
 #elif ndrange
 #include "kernel_velfg_ndrange.hpp"
 #elif pipes
@@ -149,6 +153,8 @@ int main(int argc, char *argv[]) {
 
 #if reduced
     velfg_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+#elif ndrange_reduced
+    velfg_ndrange_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif ndrange
     velfg_ndrange(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif pipes

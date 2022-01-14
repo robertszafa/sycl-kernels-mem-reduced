@@ -10,11 +10,11 @@
 
 using namespace sycl;
 
-void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<float> &v,
-                   const std::vector<float> &w, const std::vector<float> &dx1,
-                   const std::vector<float> &dy1, const std::vector<float> &dzn,
-                   const std::vector<float> &dzs, std::vector<float> &f, std::vector<float> &g,
-                   std::vector<float> &h) {
+void velfg_swi_reduced(queue &q, const std::vector<float> &u, const std::vector<float> &v,
+                       const std::vector<float> &w, const std::vector<float> &dx1,
+                       const std::vector<float> &dy1, const std::vector<float> &dzn,
+                       const std::vector<float> &dzs, std::vector<float> &f, std::vector<float> &g,
+                       std::vector<float> &h) {
 
   range<1> num_items{f.size()};
 
@@ -123,34 +123,34 @@ void velfg_reduced(queue &q, const std::vector<float> &u, const std::vector<floa
       const int s8[] = {198, 199};
       const int s11[] = {183, 184};
 #elif IP == 100 && JP == 100
-      const int s1[] = {103,104,205,10507};
-      const int s2[] = {103,10405,10406,10506,10507};
-      const int s3[] = {103,10405,10506,10507,10608};
-      const int s4[] = {10506,20910};
-      const int s5[] = {10405,20809};
-      const int s6[] = {10405,10506,10507};
-      const int s8[] = {10818,10819};
-      const int s11[] = {10713,10714};
+      const int s1[] = {103, 104, 205, 10507};
+      const int s2[] = {103, 10405, 10406, 10506, 10507};
+      const int s3[] = {103, 10405, 10506, 10507, 10608};
+      const int s4[] = {10506, 20910};
+      const int s5[] = {10405, 20809};
+      const int s6[] = {10405, 10506, 10507};
+      const int s8[] = {10818, 10819};
+      const int s11[] = {10713, 10714};
 #elif IP == 200 && JP == 200
-      const int s1[] = {203,204,405,41007};
-      const int s2[] = {203,40805,40806,41006,41007};
-      const int s3[] = {203,40805,41006,41007,41208};
-      const int s4[] = {41006,81810};
-      const int s5[] = {40805,81609};
-      const int s6[] = {40805,41006,41007};
-      const int s8[] = {41618,41619};
-      const int s11[] = {41413,41414};
+      const int s1[] = {203, 204, 405, 41007};
+      const int s2[] = {203, 40805, 40806, 41006, 41007};
+      const int s3[] = {203, 40805, 41006, 41007, 41208};
+      const int s4[] = {41006, 81810};
+      const int s5[] = {40805, 81609};
+      const int s6[] = {40805, 41006, 41007};
+      const int s8[] = {41618, 41619};
+      const int s11[] = {41413, 41414};
 #elif IP == 300 && JP == 300
-      const int s1[] = {303,304,605,91507};
-      const int s2[] = {303,91205,91206,91506,91507};
-      const int s3[] = {303,91205,91506,91507,91808};
-      const int s4[] = {91506,182710};
-      const int s5[] = {91205,182409};
-      const int s6[] = {91205,91506,91507};
-      const int s8[] = {92418,92419};
-      const int s11[] = {92113,92114};
+      const int s1[] = {303, 304, 605, 91507};
+      const int s2[] = {303, 91205, 91206, 91506, 91507};
+      const int s3[] = {303, 91205, 91506, 91507, 91808};
+      const int s4[] = {91506, 182710};
+      const int s5[] = {91205, 182409};
+      const int s6[] = {91205, 91506, 91507};
+      const int s8[] = {92418, 92419};
+      const int s11[] = {92113, 92114};
 #else
-    #error "Domain size not generated (the stencil offsets come hardcoded from our toolchain)."
+#error "Domain size not generated (the stencil offsets come hardcoded from our toolchain)."
 #endif
 
       int s_idx_1 = 0;
