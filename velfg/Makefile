@@ -33,8 +33,9 @@ $(BIN): $(SRC) $(HDR) | bin
 $(BIN).fpga_emu: $(SRC) $(HDR) | bin
 	$(CXX) $(CXXFLAGS) -fintelfpga $< -o $@ -DFPGA_EMULATOR=1
 
+# To reuse fpga image add: -reuse-exe=$(BIN).fpga
 $(BIN).fpga: $(BIN).dev.o | bin
-	$(CXX) $(CXXFLAGS) -fintelfpga $< -o $@ -Xshardware
+	$(CXX) $(CXXFLAGS) -fintelfpga $< -o $@ -Xshardware 
 
 $(BIN).dev.o: $(SRC) $(HDR) | bin
 	$(CXX) $(CXXFLAGS) -fintelfpga -c $< -o $@ -DFPGA=1

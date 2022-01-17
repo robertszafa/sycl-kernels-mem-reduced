@@ -8,8 +8,19 @@ RESULTS_FILE = 'results_velfg.csv'
 
 BIN_PATH = './bin/'
 KERNEL_PREFIX = 'velfg'
-KERNEL_TYPES = ['swi', 'swi_reduced', 'ndrange', 'ndrange_reduced', 'pipes']
-SIZES = ['10x10', '100x100', '200x200', '300x300']
+KERNEL_TYPES = [
+    'swi', 
+    'swi_reduced', 
+    'ndrange', 
+    'ndrange_reduced', 
+    'pipes'
+    ]
+SIZES = [
+    '10x10', 
+    '100x100', 
+    '200x200', 
+    '300x300'
+    ]
 
 
 
@@ -24,7 +35,7 @@ if __name__ == "__main__":
         kernel_ram_usage = [kernel_type]
 
         for size in SIZES:
-            binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga_emu'
+            binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga'
             report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga.prj/acl_quartus_report.txt'
             print(f'\n--- {binary} ---')
             
@@ -36,6 +47,7 @@ if __name__ == "__main__":
                 for _ in range(REPEAT):
                     out = os.popen(binary).read()
                     time_str = re.findall("\d+\.\d+", out)
+                    print(time_str)
                     try:
                         time = float(time_str[0]) if float(time_str[0]) < time else time
                     except:
