@@ -50,7 +50,7 @@ void velfg_swi_reduced(queue &q, const std::vector<float> &u, const std::vector<
     accessor g_1(g_buf, hnd, write_only, no_init);
     accessor h_1(h_buf, hnd, write_only, no_init);
 
-    hnd.single_task([=]() {
+    hnd.single_task<class velfg_superkernel>([=]() [[intel::kernel_args_restrict]] {
       const int kp___velfg_map_76_scal = KP;
       const int u0___velfg_map_76_scal = 0;
       const int kp___velfg_map_133_scal = KP;

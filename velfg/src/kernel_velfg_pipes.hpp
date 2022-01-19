@@ -187,7 +187,7 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
     accessor v(u_buf, hnd, read_only);
     accessor w(u_buf, hnd, read_only);
 
-    hnd.single_task([=]() {
+    hnd.single_task<class memrd>([=]() [[intel::kernel_args_restrict]] {
       // Writes and reads from the same channel must follow the same sequence to
       // prevent deadlock. Use mem_fence() to ensure ordering.
       for (int count = 0; count < DOMAIN_SIZE; count++) {
@@ -201,7 +201,7 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
   //////////////////////////////
   // memory read -> map76 SMACHE
   q.submit([&](handler &hnd) {
-    hnd.single_task([=]() {
+    hnd.single_task<class memrd_smache>([=]() [[intel::kernel_args_restrict]] {
       // Store the stencil reach + the current i_j_k element
       float u_buffer[STENCIL_REACH + 1];
       float v_buffer[STENCIL_REACH + 1];
@@ -263,7 +263,7 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
     accessor dzn(dzn_buf, hnd, read_only);
     accessor dzs(dzs_buf, hnd, read_only);
 
-    hnd.single_task([=]() {
+    hnd.single_task<class map76_133>([=]() [[intel::kernel_args_restrict]] {
       const int u0 = 0;
 
       const int k_vel2_range = (((KP + 1) - 1) + 1);
@@ -384,7 +384,7 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
   //////////////////////////////
   // map 76_and_133 --> map 218 SMACHE
   q.submit([&](handler &hnd) {
-    hnd.single_task([=]() {
+    hnd.single_task<class map76_133_smache>([=]() [[intel::kernel_args_restrict]] {
       // Store the stencil reach + the current i_j_k element
       // All cov and diu reaches are purely positive, there are only 3 cases:
       /// (i+1, j, k) or (i, j+1, k) or (i, j, k+1)
@@ -538,7 +538,7 @@ void velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<float>
     accessor g(g_buf, hnd, write_only, no_init);
     accessor h(h_buf, hnd, write_only, no_init);
 
-    hnd.single_task([=]() {
+    hnd.single_task<class map218>([=]() [[intel::kernel_args_restrict]] {
       const float vn = 15.83 * 0.000001;
 
       const int k_range = ((KP - 1) + 1);

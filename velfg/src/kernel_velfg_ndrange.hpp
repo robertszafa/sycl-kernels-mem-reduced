@@ -70,7 +70,7 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     accessor cov9(cov9_buf, hnd, write_only, no_init);
 
     // map 76
-    hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
+    hnd.parallel_for<class map76>(DOMAIN_SIZE, [=](id<1> item_id) [[intel::kernel_args_restrict]] {
       const int global_id = item_id + 1;
 
       float nou1[U_V_W_ARRAY_SIZE];
@@ -242,7 +242,7 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     accessor diu8(diu8_buf, hnd, write_only, no_init);
 
     // map 133
-    hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
+    hnd.parallel_for<class map133>(DOMAIN_SIZE, [=](id<1> item_id) [[intel::kernel_args_restrict]] {
       const int global_id = item_id + 1;
 
       float nou7[U_V_W_ARRAY_SIZE];
@@ -337,7 +337,7 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     accessor h_1(h_buf, hnd, write_only, no_init);
 
     // map 218
-    hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
+    hnd.parallel_for<class map218>(DOMAIN_SIZE, [=](id<1> item_id) [[intel::kernel_args_restrict]] {
       const int global_id = item_id + 1;
 
       float dfu1[U_V_W_ARRAY_SIZE];

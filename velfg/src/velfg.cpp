@@ -125,9 +125,8 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    // Enable profiling.
-    property_list properties{property::queue::enable_profiling()};
-    queue q(d_selector, exception_handler, properties);
+    // property_list properties{property::queue::enable_profiling()};
+    queue q(d_selector, exception_handler);
 
     // Print out the device information used for the kernel code.
     std::cout << "Running on device: " << q.get_device().get_info<info::device::name>() << "\n";
@@ -151,24 +150,27 @@ int main(int argc, char *argv[]) {
 
     auto start = std::clock();
 
-#if reduced
-    velfg_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+#if swi_reduced
+    velfg_swi_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+#elif swi
+    velfg_swi(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif ndrange_reduced
     velfg_ndrange_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif ndrange
     velfg_ndrange(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif pipes
     velfg_pipes(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+#else
+    #error "At least default reduced should be defined."
 #endif
 
     auto stop = std::clock();
 
-    std::cout << "\nFinished kernel execution in " << 1000.0 * (stop - start) / CLOCKS_PER_SEC
-              << " ms\n";
+    std::cout << "\nFinished kernel execution in (ms): " << 1000.0 * (stop - start) / CLOCKS_PER_SEC << "\n";
 
-    std::cout << f_1[1] << "\n";
-    std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";
-    std::cout << f_1[F_G_H_IDX_1_1_1 + 1] << "\n";
+    // std::cout << f_1[1] << "\n";
+    // std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";
+    // std::cout << f_1[F_G_H_IDX_1_1_1 + 1] << "\n";
 
   } catch (exception const &e) {
     std::cout << "An exception was caught.\n";

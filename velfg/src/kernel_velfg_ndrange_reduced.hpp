@@ -50,7 +50,7 @@ void velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::vec
     accessor g_1(g_buf, hnd, write_only, no_init);
     accessor h_1(h_buf, hnd, write_only, no_init);
 
-    hnd.parallel_for(DOMAIN_SIZE, [=](id<1> item_id) {
+    hnd.parallel_for<class velfg_superkernel>(DOMAIN_SIZE, [=](id<1> item_id) [[intel::kernel_args_restrict]] {
       const int global_id = item_id + 1;
 
       const int kp___velfg_map_76_scal = KP;

@@ -43,6 +43,7 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
       diu5_buf(uvw_range), diu6_buf(uvw_range), diu7_buf(uvw_range), diu8_buf(uvw_range),
       diu9_buf(uvw_range);
 
+  
   // Submit kernels in-order to the same blocking queue.
   q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
@@ -70,7 +71,7 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
     accessor cov9(cov9_buf, hnd, write_only, no_init);
 
     // map 76
-    hnd.single_task([=]() {
+    hnd.single_task<class map76>([=]() [[intel::kernel_args_restrict]] {
       float nou1[U_V_W_ARRAY_SIZE];
       float nou2[U_V_W_ARRAY_SIZE];
       float nou3[U_V_W_ARRAY_SIZE];
@@ -250,7 +251,7 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
     accessor diu8(diu8_buf, hnd, write_only, no_init);
 
     // map 133
-    hnd.single_task([=]() {
+    hnd.single_task<class map133>([=]() [[intel::kernel_args_restrict]] {
       float nou7[U_V_W_ARRAY_SIZE];
       float nou8[U_V_W_ARRAY_SIZE];
 
@@ -352,7 +353,7 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
     accessor h_1(h_buf, hnd, write_only, no_init);
 
     // map 218
-    hnd.single_task([=]() {
+    hnd.single_task<class map218>([=]() [[intel::kernel_args_restrict]] {
       float dfu1[U_V_W_ARRAY_SIZE];
       float dfv1[U_V_W_ARRAY_SIZE];
       float dfw1[U_V_W_ARRAY_SIZE];
