@@ -61,6 +61,8 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
     accessor diu4(diu4_buf, hnd, write_only, no_init);
     accessor diu5(diu5_buf, hnd, write_only, no_init);
     accessor diu6(diu6_buf, hnd, write_only, no_init);
+    accessor diu7(diu7_buf, hnd, write_only, no_init);
+    accessor diu8(diu8_buf, hnd, write_only, no_init);
     accessor diu9(diu9_buf, hnd, write_only, no_init);
     accessor cov1(cov1_buf, hnd, write_only, no_init);
     accessor cov2(cov2_buf, hnd, write_only, no_init);
@@ -68,16 +70,20 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
     accessor cov4(cov4_buf, hnd, write_only, no_init);
     accessor cov5(cov5_buf, hnd, write_only, no_init);
     accessor cov6(cov6_buf, hnd, write_only, no_init);
+    accessor cov7(cov7_buf, hnd, write_only, no_init);
+    accessor cov8(cov8_buf, hnd, write_only, no_init);
     accessor cov9(cov9_buf, hnd, write_only, no_init);
 
     // map 76
-    hnd.single_task<class map76>([=]() [[intel::kernel_args_restrict]] {
+    hnd.single_task<class map76_133>([=]() [[intel::kernel_args_restrict]] {
       float nou1[U_V_W_ARRAY_SIZE];
       float nou2[U_V_W_ARRAY_SIZE];
       float nou3[U_V_W_ARRAY_SIZE];
       float nou4[U_V_W_ARRAY_SIZE];
       float nou5[U_V_W_ARRAY_SIZE];
       float nou6[U_V_W_ARRAY_SIZE];
+      float nou7[U_V_W_ARRAY_SIZE];
+      float nou8[U_V_W_ARRAY_SIZE];
       float nou9[U_V_W_ARRAY_SIZE];
 
       const int u0 = 0;
@@ -232,52 +238,8 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
                        k_vel2)] *
             diu6[F3D2C((((IP + 2) - 0) + 1), (((JP + 2) - 0) + 1), 0, 0, 0, i_vel2, j_vel2,
                        k_vel2)];
-      }
-    });
-  });
 
-  q.submit([&](handler &hnd) {
-    // stream debug(1024, 256, hnd);
-    accessor u(u_buf, hnd, read_only);
-    accessor v(v_buf, hnd, read_only);
-    accessor w(w_buf, hnd, read_only);
-    accessor dx1(dx1_buf, hnd, read_only);
-    accessor dy1(dy1_buf, hnd, read_only);
-    accessor dzn(dzn_buf, hnd, read_only);
-
-    accessor cov7(cov7_buf, hnd, write_only, no_init);
-    accessor cov8(cov8_buf, hnd, write_only, no_init);
-    accessor diu7(diu7_buf, hnd, write_only, no_init);
-    accessor diu8(diu8_buf, hnd, write_only, no_init);
-
-    // map 133
-    hnd.single_task<class map133>([=]() [[intel::kernel_args_restrict]] {
-      float nou7[U_V_W_ARRAY_SIZE];
-      float nou8[U_V_W_ARRAY_SIZE];
-
-      const int u0 = 0;
-      int i_vel2;
-      int j_vel2;
-      int k_vel2;
-      int k_vel2_range;
-      int j_vel2_range;
-      int i_vel2_range;
-      int k_vel2_rel;
-      int j_vel2_rel;
-      int i_vel2_rel;
-
-      for (int global_id = 1; global_id < DOMAIN_SIZE; ++global_id) {
-
-        k_vel2_range = (((KP - 1) - 1) + 1);
-        j_vel2_range = ((JP - 1) + 1);
-        i_vel2_range = ((IP - 1) + 1);
-        k_vel2_rel = (global_id / (j_vel2_range * i_vel2_range));
-        k_vel2 = k_vel2_rel + 1;
-        j_vel2_rel = ((global_id - (k_vel2_rel * (j_vel2_range * i_vel2_range))) / i_vel2_range);
-        j_vel2 = j_vel2_rel + 1;
-        i_vel2_rel = ((global_id - (k_vel2_rel * (j_vel2_range * i_vel2_range))) -
-                      (j_vel2_rel * i_vel2_range));
-        i_vel2 = i_vel2_rel + 1;
+        // Map 133
         nou7[F3D2C((((IP + 2) - 0) + 1), (((JP + 2) - 0) + 1), 0, 0, 0, i_vel2, j_vel2, k_vel2)] =
             (dzn[F1D2C((-1), k_vel2 + 1)] * u[F3D2C((((IP + 1) - 0) + 1), (((JP + 1) - 0) + 1), 0,
                                                     0, 0, i_vel2 - 1, j_vel2, k_vel2)] +
@@ -315,9 +277,11 @@ void velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &
                        k_vel2)] *
             diu8[F3D2C((((IP + 2) - 0) + 1), (((JP + 2) - 0) + 1), 0, 0, 0, i_vel2, j_vel2,
                        k_vel2)];
+
       }
     });
   });
+
 
   q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
