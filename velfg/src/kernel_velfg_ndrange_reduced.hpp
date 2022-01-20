@@ -151,7 +151,26 @@ void velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::vec
       const int s6[] = {91205,91506,91507};
       const int s8[] = {92418,92419};
       const int s11[] = {92113,92114};
+#elif IP == 900 && JP == 900
+      const int s1[] = {903,904,1805,814507};
+      const int s2[] = {903,813605,813606,814506,814507};
+      const int s3[] = {903,813605,814506,814507,815408};
+      const int s4[] = {814506,1628110};
+      const int s5[] = {813605,1627209};
+      const int s6[] = {813605,814506,814507};
+      const int s8[] = {817218,817219};
+      const int s11[] = {816313,816314};
+#elif IP == 1900 && JP == 1900
+      const int s1[] = {1903,1904,3805,3619507};
+      const int s2[] = {1903,3617605,3617606,3619506,3619507};
+      const int s3[] = {1903,3617605,3619506,3619507,3621408};
+      const int s4[] = {3619506,7237110};
+      const int s5[] = {3617605,7235209};
+      const int s6[] = {3617605,3619506,3619507};
+      const int s8[] = {3625218,3625219};
+      const int s11[] = {3623313,3623314};
 #else
+
 #error "Domain size not generated (the stencil offsets come hardcoded from our toolchain)."
 #endif
 
