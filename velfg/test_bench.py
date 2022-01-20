@@ -25,21 +25,26 @@ SIZES = [
 # Found in report.htlm under area. The numbers seems to be stable, inrespective of kernel source.
 BRAM_STATIC_PARTITION = 492
 
+KP_DIM = 90
+
 
 if __name__ == "__main__":
     header = ['kernel'] + SIZES
     time_data = []
+    time_norm_data = []
     ram_usage_data = []
     freq_data = []
 
     for kernel_type in KERNEL_TYPES:
         kernel_times = [kernel_type]
+        kernel_times_norm = [kernel_type]
         kernel_ram_usage = [kernel_type]
         kernel_freq = [kernel_type]
 
         for size in SIZES:
-            binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga_emu'
-            report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.prj/acl_quartus_report.txt'
+            binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga'
+            report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga.prj/acl_quartus_report.txt'
+            domain_size = int(size.split('x')[0]) * int(size.split('x')[1]) * KP_DIM
             print(f'\n--- {binary} ---')
             
             if not os.path.isfile(binary):
@@ -56,6 +61,7 @@ if __name__ == "__main__":
                         print(f'{binary} output\n: {out}')
 
                 kernel_times.append(time)
+                kernel_times_norm.append(time / domain_size)
             
 
             if not os.path.isfile(report):
@@ -83,6 +89,7 @@ if __name__ == "__main__":
                 kernel_freq.append(freq)
         
         time_data.append(kernel_times)
+        time_norm_data.append(kernel_times_norm)
         ram_usage_data.append(kernel_ram_usage)
         freq_data.append(kernel_freq)
 
@@ -93,6 +100,11 @@ if __name__ == "__main__":
         writer.writerow(["Time"])
         writer.writerow(header)
         writer.writerows(time_data)
+
+        writer.writerow([""])
+        writer.writerow(["Time"])
+        writer.writerow(header)
+        writer.writerows(time_norm_data)
 
         writer.writerow([""])
         writer.writerow(["RAM (only kernel system)"])
