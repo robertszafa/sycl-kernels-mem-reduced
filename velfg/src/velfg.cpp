@@ -1,8 +1,5 @@
 #include <CL/sycl.hpp>
-#include <array>
-#include <ctime>
 #include <iostream>
-#include <string>
 #include <vector>
 
 #if FPGA || FPGA_EMULATOR
@@ -12,17 +9,17 @@
 #include "velfg_sizes.hpp"
 
 #if swi_reduced
-#include "kernel_velfg_swi_reduced.hpp"
+  #include "kernel_velfg_swi_reduced.hpp"
 #elif swi
-#include "kernel_velfg_swi.hpp"
+  #include "kernel_velfg_swi.hpp"
 #elif ndrange_reduced
-#include "kernel_velfg_ndrange_reduced.hpp"
+  #include "kernel_velfg_ndrange_reduced.hpp"
 #elif ndrange
-#include "kernel_velfg_ndrange.hpp"
+  #include "kernel_velfg_ndrange.hpp"
 #elif pipes
-#include "kernel_velfg_pipes.hpp"
+  #include "kernel_velfg_pipes.hpp"
 #else
-#error "At least default reduced should be defined."
+  #error "At least default reduced should be defined."
 #endif
 
 using namespace sycl;
@@ -125,8 +122,8 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    // property_list properties{property::queue::enable_profiling()};
-    queue q(d_selector, exception_handler);
+    property_list properties{property::queue::enable_profiling()};
+    queue q(d_selector, exception_handler, properties);
 
     // Print out the device information used for the kernel code.
     std::cout << "Running on device: " << q.get_device().get_info<info::device::name>() << "\n";
@@ -148,25 +145,22 @@ int main(int argc, char *argv[]) {
 
     InitializeArrays(u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 
-    auto start = std::clock();
-
+    int kernel_time = 0;
 #if swi_reduced
-    velfg_swi_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+    kernel_time = velfg_swi_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif swi
-    velfg_swi(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+    kernel_time = velfg_swi(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif ndrange_reduced
-    velfg_ndrange_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+    kernel_time = velfg_ndrange_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif ndrange
-    velfg_ndrange(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+    kernel_time = velfg_ndrange(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif pipes
-    velfg_pipes(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
+    kernel_time = velfg_pipes(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #else
     #error "At least default reduced should be defined."
 #endif
 
-    auto stop = std::clock();
-
-    std::cout << "\nFinished kernel execution in (ms): " << 1000.0 * (stop - start) / CLOCKS_PER_SEC << "\n";
+    std::cout << "\nFinished kernel execution in (ms): " << kernel_time << "\n";
 
     // std::cout << f_1[1] << "\n";
     // std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";

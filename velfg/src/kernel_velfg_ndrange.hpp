@@ -10,7 +10,7 @@
 
 using namespace sycl;
 
-void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<float> &v,
+int velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<float> &v,
                    const std::vector<float> &w, const std::vector<float> &dx1,
                    const std::vector<float> &dy1, const std::vector<float> &dzn,
                    const std::vector<float> &dzs, std::vector<float> &f, std::vector<float> &g,
@@ -44,7 +44,7 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
       diu9_buf(uvw_range);
 
   // Submit kernels in-order to the same blocking queue.
-  q.submit([&](handler &hnd) {
+  sycl::event event_first = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
     accessor u(u_buf, hnd, read_only);
     accessor v(v_buf, hnd, read_only);
@@ -303,7 +303,7 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
     });
   });
 
-  q.submit([&](handler &hnd) {
+  sycl::event event_last = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
     accessor u(u_buf, hnd, read_only);
     accessor v(v_buf, hnd, read_only);
@@ -451,4 +451,10 @@ void velfg_ndrange(queue &q, const std::vector<float> &u, const std::vector<floa
       }
     });
   });
+
+  auto start = event_first.get_profiling_info<info::event_profiling::command_start>();
+  auto end = event_last.get_profiling_info<info::event_profiling::command_end>();
+  int time_in_ms = static_cast<int>(static_cast<ulong>(end - start) / 1000000u);
+
+  return time_in_ms;
 }

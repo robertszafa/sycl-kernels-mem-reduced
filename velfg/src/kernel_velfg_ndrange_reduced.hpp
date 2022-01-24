@@ -10,7 +10,7 @@
 
 using namespace sycl;
 
-void velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::vector<float> &v,
+int velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::vector<float> &v,
                            const std::vector<float> &w, const std::vector<float> &dx1,
                            const std::vector<float> &dy1, const std::vector<float> &dzn,
                            const std::vector<float> &dzs, std::vector<float> &f,
@@ -33,7 +33,7 @@ void velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::vec
   buffer h_buf(h.data(), num_items);
 
   // DPC++ supports unnamed lambda kernel by default.
-  q.submit([&](handler &hnd) {
+  sycl::event event = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
 
     // Global memory accessor. For local mem, use local_accessor<>
@@ -505,4 +505,10 @@ void velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::vec
       //    !RF4A End Inline
     });
   });
+
+  auto start = event.get_profiling_info<info::event_profiling::command_start>();
+  auto end = event.get_profiling_info<info::event_profiling::command_end>();
+  int time_in_ms = static_cast<int>(static_cast<ulong>(end - start) / 1000000u);
+
+  return time_in_ms;
 }
