@@ -1,6 +1,8 @@
 #include <CL/sycl.hpp>
 #include <iostream>
 #include <vector>
+#include <ctime>
+
 
 #if FPGA || FPGA_EMULATOR
 #include <sycl/ext/intel/fpga_extensions.hpp>
@@ -145,7 +147,9 @@ int main(int argc, char *argv[]) {
 
     InitializeArrays(u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 
-    int kernel_time = 0;
+    auto start = std::clock();
+    double kernel_time = 0;
+
 #if swi_reduced
     kernel_time = velfg_swi_reduced(q, u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 #elif swi
@@ -160,12 +164,18 @@ int main(int argc, char *argv[]) {
     #error "At least default reduced should be defined."
 #endif
 
+    auto stop = std::clock();
+
     std::cout << "\nFinished kernel execution in (ms): " << kernel_time << "\n";
+    std::cout << "Finished kernel execution + memory transfer in (ms): " 
+              << 1000.0 * (stop - start) / CLOCKS_PER_SEC << "\n";
 
     // std::cout << f_1[1] << "\n";
     // std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";
     // std::cout << f_1[F_G_H_IDX_1_1_1 + 1] << "\n";
 
+    // Force fpga->cpu data movement. 
+    InitializeArrays(u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
   } catch (exception const &e) {
     std::cout << "An exception was caught.\n";
     std::terminate();
