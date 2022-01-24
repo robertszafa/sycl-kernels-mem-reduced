@@ -33,13 +33,13 @@ KP_DIM = 90
 if __name__ == "__main__":
     header = ['kernel'] + SIZES
     time_data = []
-    time_norm_data = []
+    throughput_data = []
     ram_usage_data = []
     freq_data = []
 
     for kernel_type in KERNEL_TYPES:
         kernel_times = [kernel_type]
-        kernel_times_norm = [kernel_type]
+        kernel_throughput = [kernel_type]
         kernel_ram_usage = [kernel_type]
         kernel_freq = [kernel_type]
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
                         print(f'{binary} output\n: {out}')
 
                 kernel_times.append(time)
-                kernel_times_norm.append(time / domain_size)
+                kernel_throughput.append(domain_size / time)
             
 
             if not os.path.isfile(report):
@@ -91,7 +91,7 @@ if __name__ == "__main__":
                 kernel_freq.append(freq)
         
         time_data.append(kernel_times)
-        time_norm_data.append(kernel_times_norm)
+        throughput_data.append(kernel_throughput)
         ram_usage_data.append(kernel_ram_usage)
         freq_data.append(kernel_freq)
 
@@ -104,6 +104,11 @@ if __name__ == "__main__":
         writer.writerows(time_data)
 
         writer.writerow([""])
+        writer.writerow(["Throughputtem (points/ms)"])
+        writer.writerow(header)
+        writer.writerows(throughput_data)
+
+        writer.writerow([""])
         writer.writerow(["BRAMs (only kernel system)"])
         writer.writerow(header)
         writer.writerows(ram_usage_data)
@@ -112,8 +117,3 @@ if __name__ == "__main__":
         writer.writerow(["Frequency (MHz)"])
         writer.writerow(header)
         writer.writerows(freq_data)
-
-        writer.writerow([""])
-        writer.writerow(["Time per domain item (ms)"])
-        writer.writerow(header)
-        writer.writerows(time_norm_data)
