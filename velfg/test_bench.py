@@ -19,7 +19,9 @@ SIZES = [
     '10x10', 
     '100x100', 
     '200x200', 
-    '300x300'
+    '300x300',
+    '900x900',
+    '1900x1900',
     ]
 
 # Found in report.htlm under area. The numbers seems to be stable, inrespective of kernel source.
@@ -97,21 +99,21 @@ if __name__ == "__main__":
     with open(RESULTS_FILE, 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
-        writer.writerow(["Time"])
+        writer.writerow(["Time (ms)"])
         writer.writerow(header)
         writer.writerows(time_data)
 
         writer.writerow([""])
-        writer.writerow(["Time"])
-        writer.writerow(header)
-        writer.writerows(time_norm_data)
-
-        writer.writerow([""])
-        writer.writerow(["RAM (only kernel system)"])
+        writer.writerow(["BRAMs (only kernel system)"])
         writer.writerow(header)
         writer.writerows(ram_usage_data)
 
         writer.writerow([""])
-        writer.writerow(["Frequency"])
+        writer.writerow(["Frequency (MHz)"])
         writer.writerow(header)
         writer.writerows(freq_data)
+
+        writer.writerow([""])
+        writer.writerow(["Time per domain item (ms)"])
+        writer.writerow(header)
+        writer.writerows(time_norm_data)
