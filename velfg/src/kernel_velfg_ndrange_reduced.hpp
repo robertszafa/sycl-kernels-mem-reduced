@@ -151,6 +151,15 @@ double velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::v
       const int s6[] = {91205,91506,91507};
       const int s8[] = {92418,92419};
       const int s11[] = {92113,92114};
+#elif IP == 600 && JP == 600
+      const int s1[] = {603,604,1205,363007};
+      const int s2[] = {603,362405,362406,363006,363007};
+      const int s3[] = {603,362405,363006,363007,363608};
+      const int s4[] = {363006,725410}
+      const int s5[] = {362405,724809};
+      const int s6[] = {362405,363006,363007};
+      const int s8[] = {364818,364819};
+      const int s11[] = {364213,364214};
 #elif IP == 900 && JP == 900
       const int s1[] = {903,904,1805,814507};
       const int s2[] = {903,813605,813606,814506,814507};
