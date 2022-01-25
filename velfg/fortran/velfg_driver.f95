@@ -21,8 +21,7 @@ program main
    integer, parameter :: ST_velfg_MAP_218 = 28 !  velfg_map_218
    integer, dimension(3) :: states = (/ST_velfg_MAP_76, ST_velfg_MAP_133, ST_velfg_MAP_218/)
    integer :: state_ptr, state_idx
-   integer :: clock_rate
-   integer(kind=4), dimension(0:1) :: timestamp
+   real(kind=4), dimension(0:1) :: timestamp
 
    real, allocatable :: u(:, :, :)
    real, allocatable :: v(:, :, :)
@@ -109,7 +108,7 @@ program main
       dy1(j) = 1.
    end do
 
-   call system_clock(timestamp(0), clock_rate)
+   call cpu_time(timestamp(0))
    do state_idx = 1, 3
       state_ptr = states(state_idx)
       do global_id = 1, IP*JP*KP - 1
@@ -121,8 +120,8 @@ program main
       end do
    end do
 
-   call system_clock(timestamp(1), clock_rate)
-   print '("Finished kernel execution in (ms): ",f6.3)', (timestamp(1) - timestamp(0))/real(clock_rate)
-   print '("Finished kernel execution + memory transfer in (ms): ",f6.3)', (timestamp(1) - timestamp(0))/real(clock_rate)
+   call cpu_time(timestamp(1))
+   print '("Finished kernel execution in (ms): ",f6.3)', (timestamp(1) - timestamp(0)) 
+   print '("Finished kernel execution + memory transfer in (ms): ",f6.3)', (timestamp(1) - timestamp(0)) 
 
 end program main
