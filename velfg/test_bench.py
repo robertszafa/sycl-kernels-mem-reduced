@@ -20,7 +20,6 @@ SIZES = [
     '100x100', 
     '200x200', 
     '300x300',
-    '600x600',
     '900x900',
     '1900x1900',
     ]
@@ -33,13 +32,15 @@ KP_DIM = 90
 
 if __name__ == "__main__":
     header = ['kernel'] + SIZES
-    time_data = []
+    kernel_time_data = []
+    kernel_mem_time_data = []
     throughput_data = []
     ram_usage_data = []
     freq_data = []
 
     for kernel_type in KERNEL_TYPES:
         kernel_times = [kernel_type]
+        kernel_mem_times = [kernel_type]
         kernel_throughput = [kernel_type]
         kernel_ram_usage = [kernel_type]
         kernel_freq = [kernel_type]
@@ -57,14 +58,17 @@ if __name__ == "__main__":
                 time = float("inf")
                 for _ in range(REPEAT):
                     out = os.popen(binary).read()
-                    time_str = re.findall("\d+\.\d+", out)
+                    kernel_time_str = re.findall("kernel execution in (ms): (.+)", out)
+                    kernel_mem_time_str = re.findall("kernel execution + memory transfer in (ms): (.+)", out)
                     try:
-                        time = float(time_str[0]) if float(time_str[0]) < time else time
+                        kernel_time = float(kernel_time_str[0]) if float(kernel_time_str[0]) < kernel_time else kernel_time
+                        kernel_mem_time = float(kernel_mem_time_str[0]) if float(kernel_mem_time_str[0]) < kernel_mem_time else kernel_mem_time
                     except:
                         print(f'{binary} output\n: {out}')
 
-                kernel_times.append(time)
-                kernel_throughput.append(domain_size / time)
+                kernel_times.append(kernel_time)
+                kernel_mem_times.append(kernel_mem_time)
+                kernel_throughput.append(domain_size / kernel_time)
             
 
             if not os.path.isfile(report):
@@ -91,7 +95,7 @@ if __name__ == "__main__":
                 kernel_ram_usage.append(rams)
                 kernel_freq.append(freq)
         
-        time_data.append(kernel_times)
+        kernel_time_data.append(kernel_times)
         throughput_data.append(kernel_throughput)
         ram_usage_data.append(kernel_ram_usage)
         freq_data.append(kernel_freq)
@@ -100,14 +104,19 @@ if __name__ == "__main__":
     with open(RESULTS_FILE, 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
-        writer.writerow(["Time (ms)"])
+        writer.writerow(["Kernel exec time (ms)"])
         writer.writerow(header)
-        writer.writerows(time_data)
+        writer.writerows(kernel_time_data)
 
         writer.writerow([""])
         writer.writerow(["Throughputtem (points/ms)"])
         writer.writerow(header)
         writer.writerows(throughput_data)
+
+        writer.writerow([""])
+        writer.writerow(["Kernel + mem transfer time (ms)"])
+        writer.writerow(header)
+        writer.writerows(kernel_mem_time_data)
 
         writer.writerow([""])
         writer.writerow(["BRAMs (only kernel system)"])
