@@ -55,7 +55,7 @@ if __name__ == "__main__":
             report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga.prj/acl_quartus_report.txt'
             domain_size = int(size.split('x')[0]) * int(size.split('x')[1]) * KP_DIM
 
-            print(f'Running {binary} {REPEAT} times ...')
+            print(f'Running {binary} {REPEAT} times...')
             
             if not os.path.isfile(binary):
                 print(binary + " doesn't exist. Skipping time test..")
@@ -68,8 +68,8 @@ if __name__ == "__main__":
 
                 for _ in range(REPEAT):
                     out = os.popen(binary).read()
-                    kernel_time_str = re.findall(r"Finished kernel execution in \(ms\): (.+)", out)
-                    kernel_mem_time_str = re.findall(r"Finished kernel execution \+ memory transfer in \(ms\): (.+)", out)
+                    kernel_time_str = re.findall(r"Finished kernel execution in \(ms\):\s*(.+)", out)
+                    kernel_mem_time_str = re.findall(r"Finished kernel execution \+ memory transfer in \(ms\):\s*(.+)", out)
                     try:
                         kernel_time = float(kernel_time_str[0]) if float(kernel_time_str[0]) < kernel_time else kernel_time
                         kernel_mem_time = float(kernel_mem_time_str[0]) if float(kernel_mem_time_str[0]) < kernel_mem_time else kernel_mem_time

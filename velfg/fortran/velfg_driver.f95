@@ -121,7 +121,7 @@ program main
    end do
 
    call cpu_time(timestamp(1))
-   print '("Finished kernel execution in (ms): ",f6.3)', (timestamp(1) - timestamp(0)) 
-   print '("Finished kernel execution + memory transfer in (ms): ",f6.3)', (timestamp(1) - timestamp(0)) 
+   print '("Finished kernel execution in (ms): ",f10.3)', (timestamp(1) - timestamp(0)) * 1000.0
+   print '("Finished kernel execution + memory transfer in (ms): ",f10.3)', (timestamp(1) - timestamp(0)) * 1000.0
 
 end program main
