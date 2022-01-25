@@ -2,7 +2,7 @@ import csv
 import os
 import re
 
-REPEAT = 5
+REPEAT = 3
 
 RESULTS_FILE = 'results_velfg.csv'
 
@@ -20,6 +20,7 @@ SIZES = [
     '100x100', 
     '200x200', 
     '300x300',
+    '600x600',
     '900x900',
     '1900x1900',
     ]
@@ -49,22 +50,24 @@ if __name__ == "__main__":
             binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga'
             report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga.prj/acl_quartus_report.txt'
             domain_size = int(size.split('x')[0]) * int(size.split('x')[1]) * KP_DIM
-            print(f'\n--- {binary} ---')
+            print(f'Running {binary} {REPEAT} times ...')
             
             if not os.path.isfile(binary):
                 print(binary + " doesn't exist. Skipping time test..")
                 kernel_times.append('N/A')
             else:
-                time = float("inf")
+                kernel_time = float("inf")
+                kernel_mem_time = float("inf")
+
                 for _ in range(REPEAT):
                     out = os.popen(binary).read()
-                    kernel_time_str = re.findall("kernel execution in (ms): (.+)", out)
-                    kernel_mem_time_str = re.findall("kernel execution + memory transfer in (ms): (.+)", out)
+                    kernel_time_str = re.findall(r"Finished kernel execution in \(ms\): (.+)", out)
+                    kernel_mem_time_str = re.findall(r"Finished kernel execution \+ memory transfer in \(ms\): (.+)", out)
                     try:
                         kernel_time = float(kernel_time_str[0]) if float(kernel_time_str[0]) < kernel_time else kernel_time
                         kernel_mem_time = float(kernel_mem_time_str[0]) if float(kernel_mem_time_str[0]) < kernel_mem_time else kernel_mem_time
                     except:
-                        print(f'{binary} output\n: {out}')
+                        print(f'**ERROR** run {binary} & got output:\n {out}')
 
                 kernel_times.append(kernel_time)
                 kernel_mem_times.append(kernel_mem_time)
@@ -96,6 +99,7 @@ if __name__ == "__main__":
                 kernel_freq.append(freq)
         
         kernel_time_data.append(kernel_times)
+        kernel_mem_time_data.append(kernel_times)
         throughput_data.append(kernel_throughput)
         ram_usage_data.append(kernel_ram_usage)
         freq_data.append(kernel_freq)
@@ -109,7 +113,7 @@ if __name__ == "__main__":
         writer.writerows(kernel_time_data)
 
         writer.writerow([""])
-        writer.writerow(["Throughputtem (points/ms)"])
+        writer.writerow(["Throughput (points/ms)"])
         writer.writerow(header)
         writer.writerows(throughput_data)
 
@@ -119,7 +123,7 @@ if __name__ == "__main__":
         writer.writerows(kernel_mem_time_data)
 
         writer.writerow([""])
-        writer.writerow(["BRAMs (only kernel system)"])
+        writer.writerow(["BRAMs (only kernel system, SYCL takes 492)"])
         writer.writerow(header)
         writer.writerows(ram_usage_data)
 
