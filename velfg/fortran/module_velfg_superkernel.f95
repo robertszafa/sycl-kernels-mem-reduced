@@ -240,7 +240,11 @@ subroutine velfg_map_218(dx1,cov1,cov2,cov3,diu1,diu2,dy1,diu3,dzn,dfu1,cov4,cov
 
    end subroutine velfg_map_218
 
-   subroutine velfg_superkernel(f, g, h, dzn, u, v, w, dx1, dy1, dzs, state_ptr, global_id)
+   subroutine velfg_superkernel(f, g, h, dzn, u, v, w, dx1, dy1, dzs, state_ptr, global_id, &
+                                  diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9, &
+                                    cov1, cov2, cov3, cov4, cov5, cov6, cov7, cov8, cov9, &
+                                    nou1, nou5, nou9, nou2, nou3, nou4, nou6, nou7, nou8, &
+                                    dfu1, dfv1, dfw1)
 
       integer, parameter :: ip = IP
       integer, parameter :: jp = JP

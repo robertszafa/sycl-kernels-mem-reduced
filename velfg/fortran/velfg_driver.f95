@@ -6,13 +6,6 @@ program main
    integer, parameter :: jp = JP
    integer, parameter :: kp = 90
 
-   real, dimension(0:(ip + 1), (-1):(jp + 1), 0:(kp + 1)) :: u
-   real, dimension(0:(ip + 1), (-1):(jp + 1), 0:(kp + 1)) :: v
-   real, dimension(0:(ip + 1), (-1):(jp + 1), (-1):(kp + 1)) :: w
-   real, dimension(0:ip, 0:jp, 0:kp) :: f
-   real, dimension(0:ip, 0:jp, 0:kp) :: g
-   real, dimension(0:ip, 0:jp, 0:kp) :: h
-
    real, dimension((-1):(kp + 2)) :: dzn
    real, dimension((-1):(kp + 2)) :: dzs
    real, dimension((-1):(ip + 1)) :: dx1
@@ -31,6 +24,80 @@ program main
    integer :: clock_rate
    integer(kind=4), dimension(0:1) :: timestamp
 
+   real, allocatable :: u(:, :, :)
+   real, allocatable :: v(:, :, :)
+   real, allocatable :: w(:, :, :)
+   real, allocatable :: f(:, :, :)
+   real, allocatable :: g(:, :, :)
+   real, allocatable :: h(:, :, :)
+   real, allocatable :: diu1(:, :, :)
+   real, allocatable :: diu2(:, :, :)
+   real, allocatable :: diu3(:, :, :)
+   real, allocatable :: diu4(:, :, :)
+   real, allocatable :: diu5(:, :, :)
+   real, allocatable :: diu6(:, :, :)
+   real, allocatable :: diu7(:, :, :)
+   real, allocatable :: diu8(:, :, :)
+   real, allocatable :: diu9(:, :, :)
+   real, allocatable :: cov1(:, :, :)
+   real, allocatable :: cov2(:, :, :)
+   real, allocatable :: cov3(:, :, :)
+   real, allocatable :: cov4(:, :, :)
+   real, allocatable :: cov5(:, :, :)
+   real, allocatable :: cov6(:, :, :)
+   real, allocatable :: cov7(:, :, :)
+   real, allocatable :: cov8(:, :, :)
+   real, allocatable :: cov9(:, :, :)
+   real(kind=4), allocatable :: nou1(:, :, :)
+   real(kind=4), allocatable :: nou5(:, :, :)
+   real(kind=4), allocatable :: nou9(:, :, :)
+   real(kind=4), allocatable :: nou2(:, :, :)
+   real(kind=4), allocatable :: nou3(:, :, :)
+   real(kind=4), allocatable :: nou4(:, :, :)
+   real(kind=4), allocatable :: nou6(:, :, :)
+   real(kind=4), allocatable :: nou7(:, :, :)
+   real(kind=4), allocatable :: nou8(:, :, :)
+   real, allocatable :: dfu1(:, :, :)
+   real, allocatable :: dfv1(:, :, :)
+   real, allocatable :: dfw1(:, :, :)
+
+   allocate (u(0:(ip + 1), (-1):(jp + 1), 0:(kp + 1)))
+   allocate (v(0:(ip + 1), (-1):(jp + 1), 0:(kp + 1)))
+   allocate (w(0:(ip + 1), (-1):(jp + 1), (-1):(kp + 1)))
+   allocate (f(0:ip, 0:jp, 0:kp))
+   allocate (g(0:ip, 0:jp, 0:kp))
+   allocate (h(0:ip, 0:jp, 0:kp))
+   allocate (diu1((-1):(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu2(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu3(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu4(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu5((-1):(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu6(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu7(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu8(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (diu9(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov1((-1):(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov2(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov3(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov4(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov5((-1):(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov6(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov7(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov8(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (cov9(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou1((-1):(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou5((-1):(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou9(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou2(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou3(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou4(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou6(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou7(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (nou8(0:(ip + 2), 0:(jp + 2), 0:(kp + 2)))
+   allocate (dfu1(0:ip, 1:jp, 1:kp))
+   allocate (dfv1(1:ip, 0:jp, 1:kp))
+   allocate (dfw1(1:ip, 1:jp, 1:kp))
+
    do k = -1, kp + 2
       dzn(k) = 1.
       dzs(k) = 1.
@@ -46,7 +113,11 @@ program main
    do state_idx = 1, 3
       state_ptr = states(state_idx)
       do global_id = 1, IP*JP*KP - 1
-         call velfg_superkernel(f, g, h, dzn, u, v, w, dx1, dy1, dzs, state_ptr, global_id)
+         call velfg_superkernel(f, g, h, dzn, u, v, w, dx1, dy1, dzs, state_ptr, global_id, &
+                                 diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9, &
+                                 cov1, cov2, cov3, cov4, cov5, cov6, cov7, cov8, cov9, &
+                                 nou1, nou5, nou9, nou2, nou3, nou4, nou6, nou7, nou8, &
+                                 dfu1, dfv1, dfw1)
       end do
    end do
 

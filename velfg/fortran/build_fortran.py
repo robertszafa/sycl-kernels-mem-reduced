@@ -11,7 +11,8 @@ SIZES = [
     '1900x1900',
     ]
 
-FLFLAGS = ['-Ofast','-flto', '-Wall','-cpp','-m64','-ffree-form','-ffree-line-length-0','-fconvert=little-endian','-frecord-marker=4']
+FLFLAGS = ['-Ofast','-flto', '-Wall','-cpp','-m64','-ffree-form','-ffree-line-length-0',
+           '-fconvert=little-endian','-frecord-marker=4', '-mcmodel=medium']
 
 FC='gfortran'
 
@@ -23,6 +24,8 @@ if __name__ == "__main__":
         
         flflags_string = ' '.join(FLFLAGS)
         build_command = f'{FC} {flflags_string} -DIP={ip} -DJP={jp} *.f95 -o ../bin/velfg_fortran_{ip}x{jp}.exe'
+        # print(build_command)
+
         out = os.popen(build_command).read()
 
         if out:
