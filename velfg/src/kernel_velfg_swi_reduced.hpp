@@ -148,7 +148,7 @@ double velfg_swi_reduced(queue &q, const std::vector<float> &u, const std::vecto
       const int s1[] = {603,604,1205,363007};
       const int s2[] = {603,362405,362406,363006,363007};
       const int s3[] = {603,362405,363006,363007,363608};
-      const int s4[] = {363006,725410}
+      const int s4[] = {363006,725410};
       const int s5[] = {362405,724809};
       const int s6[] = {362405,363006,363007};
       const int s8[] = {364818,364819};
