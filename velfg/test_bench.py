@@ -9,15 +9,24 @@ RESULTS_FILE = 'results_velfg.csv'
 BIN_PATH = './bin/'
 KERNEL_PREFIX = 'velfg'
 KERNEL_TYPES = [
-    'swi', 
-    'swi_reduced', 
+    'pipes',
     'ndrange', 
     'ndrange_reduced', 
-    'pipes',
+    'swi', 
+    'swi_reduced_1cu', 
+    'swi_reduced_2cu', 
+    'swi_reduced_3cu', 
+    'swi_reduced_4cu', 
+    'swi_reduced_5cu', 
+    'swi_reduced_6cu', 
     'fortran',
+    'cpu_swi',
+    'cpu_swi_reduced',
+    'cpu_ndrange',
+    'cpu_ndrange_reduced',
     ]
 SIZES = [
-    '10x10', 
+    # '10x10', 
     '100x100', 
     '200x200', 
     '300x300',
@@ -30,6 +39,10 @@ SIZES = [
 BRAM_STATIC_PARTITION = 492
 
 KP_DIM = 90
+
+CPU_DEVICE = 'Intel(R) Xeon(R) Gold 6128 CPU @ 3.40GHz'
+
+FPGA_DEVICE = 'Intel PAC Platform (pac_ee00000) Arria 10 FPGA'
 
 
 if __name__ == "__main__":
@@ -50,6 +63,9 @@ if __name__ == "__main__":
         for size in SIZES:
             if kernel_type == 'fortran':
                 binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.exe'
+            elif 'cpu' in kernel_type:
+                kernel_type_bin_name = kernel_type.strip('cpu_')
+                binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type_bin_name}_{size}'
             else:
                 binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga'
             report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga.prj/acl_quartus_report.txt'
@@ -81,7 +97,7 @@ if __name__ == "__main__":
                 kernel_throughput.append(domain_size / kernel_time)
             
             # For FPGAs, check BRAM usage and design frequency
-            if kernel_type != 'fortran':
+            if kernel_type != 'fortran' and not 'cpu' in kernel_type:
                 if not os.path.isfile(report):
                     print(report + " doesn't exist. Skipping resource usage..")
                     kernel_ram_usage.append('N/A')
@@ -108,7 +124,7 @@ if __name__ == "__main__":
 
         
         kernel_time_data.append(kernel_times)
-        kernel_mem_time_data.append(kernel_times)
+        kernel_mem_time_data.append(kernel_mem_times)
         throughput_data.append(kernel_throughput)
         ram_usage_data.append(kernel_ram_usage)
         freq_data.append(kernel_freq)
@@ -122,14 +138,14 @@ if __name__ == "__main__":
         writer.writerows(kernel_time_data)
 
         writer.writerow([""])
-        writer.writerow(["Throughput (points/ms)"])
-        writer.writerow(header)
-        writer.writerows(throughput_data)
-
-        writer.writerow([""])
         writer.writerow(["Kernel + mem transfer time (ms)"])
         writer.writerow(header)
         writer.writerows(kernel_mem_time_data)
+
+        writer.writerow([""])
+        writer.writerow(["Throughput (points/ms)"])
+        writer.writerow(header)
+        writer.writerows(throughput_data)
 
         writer.writerow([""])
         writer.writerow(["BRAMs (only kernel system, SYCL takes 492)"])
@@ -140,3 +156,7 @@ if __name__ == "__main__":
         writer.writerow(["Frequency (MHz)"])
         writer.writerow(header)
         writer.writerows(freq_data)
+
+        writer.writerow([""])
+        writer.writerow([f'CPU: {CPU_DEVICE}'])
+        writer.writerow([f'FPGA: {FPGA_DEVICE}'])

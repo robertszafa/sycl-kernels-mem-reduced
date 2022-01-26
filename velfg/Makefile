@@ -9,14 +9,20 @@ ifndef KERNEL
 KERNEL := swi_reduced
 endif
 
+# NUM_CU is the unroll factor for the swi_reduced kernel top level loop. Compute units
+# are not yet implemented in dpcpp, so unrolling the loop is the next best thing.
+# NUM_CU only makes sense for FPGA hardware compiles.
+ifdef NUM_CU
+KERNEL_POSTFIX := _$(NUM_CU)cu
+endif
 
 CXX := dpcpp
-CXXFLAGS += -std=c++17 -O2 -DIP=$(IP) -DJP=$(JP) -D$(KERNEL)
+CXXFLAGS += -std=c++17 -O2 -DIP=$(IP) -DJP=$(JP) -D$(KERNEL) -DNUM_CU=$(NUM_CU)
 # CXXFLAGS += -g
 
 SRC := src/velfg.cpp
 HDR := src/kernel_velfg_$(KERNEL).hpp src/velfg_sizes.hpp
-BIN := bin/velfg_$(KERNEL)_$(IP)x$(JP)
+BIN := bin/velfg_$(KERNEL)$(KERNEL_POSTFIX)_$(IP)x$(JP)
 
 .PHONY: host fpga_emu fpga 
 

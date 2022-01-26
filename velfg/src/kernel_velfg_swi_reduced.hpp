@@ -51,8 +51,14 @@ double velfg_swi_reduced(queue &q, const std::vector<float> &u, const std::vecto
     accessor h_1(h_buf, hnd, write_only, no_init);
 
     hnd.single_task<class velfg_superkernel>([=]() [[intel::kernel_args_restrict]] {
-#pragma unroll 2
-    [[intel::ivdep]] for (int global_id = 1; global_id < DOMAIN_SIZE; global_id += 1) {
+#pragma unroll NUM_CU
+#if FPGA || FPGA_EMULATOR
+    // ivdep allows the fpga compiler to achieve II=1 when loop is unrolled by letting it know
+    // that there are no memory dependencies across loop iterations.
+    // This attribute only works when compiling for FPGAs
+    [[intel::ivdep]] 
+#endif
+    for (int global_id = 1; global_id < DOMAIN_SIZE; global_id += 1) {
 
         const int kp___velfg_map_76_scal = KP;
         const int u0___velfg_map_76_scal = 0;

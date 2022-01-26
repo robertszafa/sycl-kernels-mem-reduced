@@ -164,6 +164,9 @@ int main(int argc, char *argv[]) {
     #error "At least default reduced should be defined."
 #endif
 
+    // Wait for all work to finish.
+    q.wait();
+    
     auto stop = std::clock();
 
     std::cout << "\nFinished kernel execution in (ms): " << kernel_time << "\n";
