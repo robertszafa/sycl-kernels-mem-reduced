@@ -20,6 +20,7 @@ KERNEL_TYPES = [
     'swi_reduced_5cu', 
     'swi_reduced_6cu', 
     'fortran',
+    'fortran_omp',
     'cpu_swi',
     'cpu_swi_reduced',
     'cpu_ndrange',

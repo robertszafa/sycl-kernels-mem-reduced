@@ -1,4 +1,5 @@
 program main
+    use omp_lib
    use module_velfg_superkernel, only: velfg_superkernel
    integer :: global_id
 
@@ -21,7 +22,7 @@ program main
    integer, parameter :: ST_velfg_MAP_218 = 28 !  velfg_map_218
    integer, dimension(3) :: states = (/ST_velfg_MAP_76, ST_velfg_MAP_133, ST_velfg_MAP_218/)
    integer :: state_ptr, state_idx
-   real(kind=4), dimension(0:1) :: timestamp
+   real(kind=8), dimension(0:1) :: timestamp
 
    real, allocatable :: u(:, :, :)
    real, allocatable :: v(:, :, :)
@@ -108,9 +109,13 @@ program main
       dy1(j) = 1.
    end do
 
-   call cpu_time(timestamp(0))
+   !call cpu_time(timestamp(0))
+   timestamp(0) = omp_get_wtime()
    do state_idx = 1, 3
       state_ptr = states(state_idx)
+#ifdef WITH_OPENMP        
+!$OMP PARALLEL DO PRIVATE(global_id)
+#endif
       do global_id = 1, IP*JP*KP - 1
          call velfg_superkernel(f, g, h, dzn, u, v, w, dx1, dy1, dzs, state_ptr, global_id, &
                                  diu1, diu2, diu3, diu4, diu5, diu6, diu7, diu8, diu9, &
@@ -120,8 +125,9 @@ program main
       end do
    end do
 
-   call cpu_time(timestamp(1))
-   print '("Finished kernel execution in (ms): ",f10.3)', (timestamp(1) - timestamp(0)) * 1000.0
+   !call cpu_time(timestamp(1))
+   timestamp(1) = omp_get_wtime()
+   print '("Finished kernel execution in (ms): ",f10.3)', (timestamp(1) - timestamp(0))  * 1000.0
    print '("Finished kernel execution + memory transfer in (ms): ",f10.3)', (timestamp(1) - timestamp(0)) * 1000.0
 
 end program main
