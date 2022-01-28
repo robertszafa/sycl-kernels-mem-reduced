@@ -41,7 +41,7 @@ BRAM_STATIC_PARTITION = 492
 
 KP_DIM = 90
 
-CPU_DEVICE = 'Intel(R) Xeon(R) Gold 6128 CPU @ 3.40GHz'
+CPU_DEVICE = 'Intel(R) Xeon(R) Gold 6128 CPU 6 cores @ 3.40GHz'
 
 FPGA_DEVICE = 'Intel PAC Platform (pac_ee00000) Arria 10 FPGA'
 
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         kernel_freq = [kernel_type]
 
         for size in SIZES:
-            if kernel_type == 'fortran':
+            if 'fortran' in kernel_type:
                 binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.exe'
             elif 'cpu' in kernel_type:
                 kernel_type_bin_name = kernel_type.strip('cpu_')
@@ -98,7 +98,7 @@ if __name__ == "__main__":
                 kernel_throughput.append(domain_size / kernel_time)
             
             # For FPGAs, check BRAM usage and design frequency
-            if kernel_type != 'fortran' and not 'cpu' in kernel_type:
+            if not 'fortran' in kernel_type and not 'cpu' in kernel_type:
                 if not os.path.isfile(report):
                     print(report + " doesn't exist. Skipping resource usage..")
                     kernel_ram_usage.append('N/A')

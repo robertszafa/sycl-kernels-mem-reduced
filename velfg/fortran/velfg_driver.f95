@@ -123,6 +123,9 @@ program main
                                  nou1, nou5, nou9, nou2, nou3, nou4, nou6, nou7, nou8, &
                                  dfu1, dfv1, dfw1)
       end do
+#ifdef WITH_OPENMP        
+!$OMP BARRIER
+#endif
    end do
 
    !call cpu_time(timestamp(1))
