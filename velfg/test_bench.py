@@ -25,6 +25,8 @@ KERNEL_TYPES = [
     'cpu_swi_reduced',
     'cpu_ndrange',
     'cpu_ndrange_reduced',
+    'gpu_ndrange',
+    'gpu_ndrange_reduced',
     ]
 SIZES = [
     # '10x10', 
@@ -44,6 +46,8 @@ KP_DIM = 90
 CPU_DEVICE = 'Intel(R) Xeon(R) Gold 6128 CPU 6 cores @ 3.40GHz'
 
 FPGA_DEVICE = 'Intel PAC Platform (pac_ee00000) Arria 10 FPGA'
+
+GPU_DEVICE = 'Intel(R) UHD Graphics P630'
 
 
 if __name__ == "__main__":
@@ -67,9 +71,13 @@ if __name__ == "__main__":
             elif 'cpu' in kernel_type:
                 kernel_type_bin_name = kernel_type.strip('cpu_')
                 binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type_bin_name}_{size}'
+            elif 'gpu' in kernel_type:
+                kernel_type_bin_name = kernel_type.strip('gpu_')
+                binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type_bin_name}_{size}.gpu'
             else:
                 binary = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga'
             report = f'{BIN_PATH}{KERNEL_PREFIX}_{kernel_type}_{size}.fpga.prj/acl_quartus_report.txt'
+
             domain_size = int(size.split('x')[0]) * int(size.split('x')[1]) * KP_DIM
 
             print(f'Running {binary} {REPEAT} times...')
@@ -98,7 +106,7 @@ if __name__ == "__main__":
                 kernel_throughput.append(domain_size / kernel_time)
             
             # For FPGAs, check BRAM usage and design frequency
-            if not 'fortran' in kernel_type and not 'cpu' in kernel_type:
+            if not 'fortran' in kernel_type and not 'cpu' in kernel_type and not 'gpu' in kernel_type:
                 if not os.path.isfile(report):
                     print(report + " doesn't exist. Skipping resource usage..")
                     kernel_ram_usage.append('N/A')
@@ -161,3 +169,4 @@ if __name__ == "__main__":
         writer.writerow([""])
         writer.writerow([f'CPU: {CPU_DEVICE}'])
         writer.writerow([f'FPGA: {FPGA_DEVICE}'])
+        writer.writerow([f'GPU: {GPU_DEVICE}'])

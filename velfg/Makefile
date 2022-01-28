@@ -28,6 +28,7 @@ BIN := bin/velfg_$(KERNEL)$(KERNEL_POSTFIX)_$(IP)x$(JP)
 
 all: host
 host: $(BIN)
+gpu: $(BIN).gpu
 fpga_emu: $(BIN).fpga_emu
 fpga: $(BIN).fpga
 report: $(BIN).a 
@@ -35,6 +36,9 @@ report: $(BIN).a
 
 $(BIN): $(SRC) $(HDR) | bin
 	$(CXX) $(CXXFLAGS) -o $@ $(SRC)
+
+$(BIN).gpu: $(SRC) $(HDR) | bin
+	$(CXX) $(CXXFLAGS) -DGPU=1 -o $@ $(SRC)
 
 $(BIN).fpga_emu: $(SRC) $(HDR) | bin
 	$(CXX) $(CXXFLAGS) -fintelfpga $< -o $@ -DFPGA_EMULATOR=1 
