@@ -1,7 +1,6 @@
 #include <CL/sycl.hpp>
 #include <iostream>
 #include <vector>
-#include <ctime>
 
 
 #if FPGA || FPGA_EMULATOR
@@ -147,7 +146,7 @@ int main(int argc, char *argv[]) {
 
     InitializeArrays(u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
 
-    auto start = std::clock();
+    auto start = std::chrono::steady_clock::now();
     double kernel_time = 0;
 
 #if swi_reduced
@@ -167,11 +166,17 @@ int main(int argc, char *argv[]) {
     // Wait for all work to finish.
     q.wait();
     
-    auto stop = std::clock();
+    auto stop = std::chrono::steady_clock::now();
+    double total_time = (std::chrono::duration<double> (stop - start)).count() * 1000.0;
+
+    // Report only one time for cpu measurements since memory transfer time should not affect perf. 
+    // (modulo caching). 
+    #if !FPGA 
+    kernel_time = total_time;
+    #endif
 
     std::cout << "\nFinished kernel execution in (ms): " << kernel_time << "\n";
-    std::cout << "Finished kernel execution + memory transfer in (ms): " 
-              << 1000.0 * (stop - start) / CLOCKS_PER_SEC << "\n";
+    std::cout << "Finished kernel execution + memory transfer in (ms): " << total_time << "\n";
 
     // std::cout << f_1[1] << "\n";
     // std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";
