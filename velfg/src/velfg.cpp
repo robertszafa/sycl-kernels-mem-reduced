@@ -172,20 +172,11 @@ int main(int argc, char *argv[]) {
     auto stop = std::chrono::steady_clock::now();
     double total_time = (std::chrono::duration<double> (stop - start)).count() * 1000.0;
 
-    // Report only one time for cpu measurements since memory transfer time should not affect perf. 
-    // (modulo caching). 
-    #if !FPGA 
-    kernel_time = total_time;
-    #endif
-
-    std::cout << "\nFinished kernel execution in (ms): " << kernel_time << "\n";
-    std::cout << "Finished kernel execution + memory transfer in (ms): " << total_time << "\n";
+    std::cout << "Kernel time (ms): " << kernel_time << "\n";
+    std::cout << "Total time (ms): " << total_time << "\n";
 
     // std::cout << f_1[1] << "\n";
-    // std::cout << f_1[F_G_H_IDX_1_1_1] << "\n";
-    // std::cout << f_1[F_G_H_IDX_1_1_1 + 1] << "\n";
-
-    // Force fpga->cpu data movement. 
+    // Force data movement. 
     InitializeArrays(u_0, v_0, w_0, dx1, dy1, dzn, dzs_0, f_1, g_1, h_1);
   } catch (exception const &e) {
     std::cout << "An exception was caught.\n";

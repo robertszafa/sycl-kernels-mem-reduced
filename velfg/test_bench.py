@@ -53,14 +53,14 @@ GPU_DEVICE = 'Intel(R) UHD Graphics P630'
 if __name__ == "__main__":
     header = ['kernel'] + SIZES
     kernel_time_data = []
-    kernel_mem_time_data = []
+    total_time_data = []
     throughput_data = []
     ram_usage_data = []
     freq_data = []
 
     for kernel_type in KERNEL_TYPES:
         kernel_times = [kernel_type]
-        kernel_mem_times = [kernel_type]
+        total_times = [kernel_type]
         kernel_throughput = [kernel_type]
         kernel_ram_usage = [kernel_type]
         kernel_freq = [kernel_type]
@@ -85,24 +85,24 @@ if __name__ == "__main__":
             if not os.path.isfile(binary):
                 print(binary + " doesn't exist. Skipping time test..")
                 kernel_times.append('N/A')
-                kernel_mem_times.append('N/A')
+                total_times.append('N/A')
                 kernel_throughput.append('N/A')
             else:
                 kernel_time = float("inf")
-                kernel_mem_time = float("inf")
+                total_time = float("inf")
 
                 for _ in range(REPEAT):
                     out = os.popen(binary).read()
-                    kernel_time_str = re.findall(r"Finished kernel execution in \(ms\):\s*(.+)", out)
-                    kernel_mem_time_str = re.findall(r"Finished kernel execution \+ memory transfer in \(ms\):\s*(.+)", out)
+                    kernel_time_str = re.findall(r"Kernel time \(ms\):\s*(.+)", out)
+                    total_time_str = re.findall(r"Total time \(ms\):\s*(.+)", out)
                     try:
                         kernel_time = float(kernel_time_str[0]) if float(kernel_time_str[0]) < kernel_time else kernel_time
-                        kernel_mem_time = float(kernel_mem_time_str[0]) if float(kernel_mem_time_str[0]) < kernel_mem_time else kernel_mem_time
+                        total_time = float(total_time_str[0]) if float(total_time_str[0]) < total_time else total_time
                     except:
                         print(f'**ERROR** run {binary} & got output:\n {out}')
 
                 kernel_times.append(kernel_time)
-                kernel_mem_times.append(kernel_mem_time)
+                total_times.append(total_time)
                 kernel_throughput.append(domain_size / kernel_time)
             
             # For FPGAs, check BRAM usage and design frequency
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
         
         kernel_time_data.append(kernel_times)
-        kernel_mem_time_data.append(kernel_mem_times)
+        total_time_data.append(total_times)
         throughput_data.append(kernel_throughput)
         ram_usage_data.append(kernel_ram_usage)
         freq_data.append(kernel_freq)
@@ -145,11 +145,6 @@ if __name__ == "__main__":
         writer.writerow(["Kernel exec time (ms)"])
         writer.writerow(header)
         writer.writerows(kernel_time_data)
-
-        writer.writerow([""])
-        writer.writerow(["Kernel + mem transfer time (ms)"])
-        writer.writerow(header)
-        writer.writerows(kernel_mem_time_data)
 
         writer.writerow([""])
         writer.writerow(["Throughput (points/ms)"])
@@ -165,6 +160,11 @@ if __name__ == "__main__":
         writer.writerow(["Frequency (MHz)"])
         writer.writerow(header)
         writer.writerows(freq_data)
+
+        writer.writerow([""])
+        writer.writerow(["Total time (JIT + mem transfer) (ms)"])
+        writer.writerow(header)
+        writer.writerows(total_time_data)
 
         writer.writerow([""])
         writer.writerow([f'CPU: {CPU_DEVICE}'])
