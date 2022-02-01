@@ -1,9 +1,7 @@
 #include <CL/sycl.hpp>
-#include <array>
-#include <ctime>
 #include <iostream>
-#include <string>
 #include <vector>
+
 
 #if FPGA || FPGA_EMULATOR
 #include <sycl/ext/intel/fpga_extensions.hpp>
@@ -11,14 +9,18 @@
 
 #include "sw2d_sizes.hpp"
 
-#if reduced
-#include "kernel_sw2d_reduced.hpp"
+#if swi_reduced
+  #include "kernel_sw2d_swi_reduced.hpp"
+#elif swi
+  #include "kernel_sw2d_swi.hpp"
+#elif ndrange_reduced
+  #include "kernel_sw2d_ndrange_reduced.hpp"
 #elif ndrange
-#include "kernel_sw2d_ndrange.hpp"
+  #include "kernel_sw2d_ndrange.hpp"
 #elif pipes
-#include "kernel_sw2d_pipes.hpp"
+  #include "kernel_sw2d_pipes.hpp"
 #else
-#error "At least default reduced should be defined."
+  #error "At least default reduced should be defined."
 #endif
 
 using namespace sycl;
@@ -82,6 +84,8 @@ int main(int argc, char *argv[]) {
 #elif FPGA
   // DPC++ extension: FPGA selector on systems with FPGA card.
   ext::intel::fpga_selector d_selector;
+#elif GPU
+  gpu_selector d_selector;
 #else
   // The default device selector will select the most performant device.
   default_selector d_selector;
@@ -110,20 +114,34 @@ int main(int argc, char *argv[]) {
 
     InitializeArrays(eta, h, u, v, wet);
 
-    auto start = std::clock();
+    auto start = std::chrono::steady_clock::now();
+    double kernel_time = 0;
 
-#if reduced
-    sw2d_reduced(q, wet, eta, u, v, h, etann, un, vn);
+#if swi_reduced
+    kernel_time = sw2d_swi_reduced(q, wet, eta, u, v, h, etann, un, vn);
+#elif swi
+    kernel_time = sw2d_swi(q, wet, eta, u, v, h, etann, un, vn);
+#elif ndrange_reduced
+    kernel_time = sw2d_ndrange_reduced(q, wet, eta, u, v, h, etann, un, vn);
 #elif ndrange
-    sw2d_ndrange(q, wet, eta, u, v, h, etann, un, vn);
+    kernel_time = sw2d_ndrange(q, wet, eta, u, v, h, etann, un, vn);
 #elif pipes
-    sw2d_pipes(q, wet, eta, u, v, h, etann, un, vn);
+    kernel_time = sw2d_pipes(q, wet, eta, u, v, h, etann, un, vn);
+#else
+    #error "At least default reduced should be defined."
 #endif
 
-    auto stop = std::clock();
+    // Wait for all work to finish.
+    q.wait();
+    
+    auto stop = std::chrono::steady_clock::now();
+    double total_time = (std::chrono::duration<double> (stop - start)).count() * 1000.0;
 
-    std::cout << "\nFinished kernel execution in " << 1000.0 * (stop - start) / CLOCKS_PER_SEC
-              << " ms\n";
+    std::cout << "Kernel time (ms): " << kernel_time << "\n";
+    std::cout << "Total time (ms): " << total_time << "\n";
+
+    // Force data movement. 
+    InitializeArrays(eta, h, u, v, wet);
   } catch (exception const &e) {
     std::cout << "An exception was caught.\n";
     std::terminate();

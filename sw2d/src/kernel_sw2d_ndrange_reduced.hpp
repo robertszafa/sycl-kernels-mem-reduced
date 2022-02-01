@@ -12,7 +12,7 @@
 
 using namespace sycl;
 
-double sw2d_ndrange(queue &q, const std::vector<int> &wet, const std::vector<float> &eta,
+double sw2d_ndrange_reduced(queue &q, const std::vector<int> &wet, const std::vector<float> &eta,
                   const std::vector<float> &u, const std::vector<float> &v,
                   const std::vector<float> &h, std::vector<float> &etann, std::vector<float> &un,
                   std::vector<float> &vn) {

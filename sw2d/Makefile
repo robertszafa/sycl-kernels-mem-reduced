@@ -9,19 +9,26 @@ ifndef KERNEL
 KERNEL := reduced
 endif
 
+# NUM_CU is the unroll factor for the swi_reduced kernel top level loop. Compute units
+# are not yet implemented in dpcpp, so unrolling the loop is the next best thing.
+# NUM_CU only makes sense for FPGA hardware compiles.
+ifdef NUM_CU
+KERNEL_POSTFIX := _$(NUM_CU)cu
+endif
 
 CXX := dpcpp
-CXXFLAGS += -std=c++17 -O2 -DNX=$(NX) -DNY=$(NY) -D$(KERNEL)
+CXXFLAGS += -std=c++17 -O2 -DNX=$(NX) -DNY=$(NY) -D$(KERNEL) -DNUM_CU=$(NUM_CU)
 # CXXFLAGS += -g
 
 SRC := src/sw2d.cpp
 HDR := src/kernel_sw2d_$(KERNEL).hpp src/sw2d_sizes.hpp
-BIN := bin/sw2d_$(KERNEL)_$(NX)x$(NY)
+BIN := bin/sw2d_$(KERNEL)$(KERNEL_POSTFIX)_$(NX)x$(NY)
 
 .PHONY: host fpga_emu fpga 
 
 all: host
 host: $(BIN)
+gpu: $(BIN).gpu
 fpga_emu: $(BIN).fpga_emu
 fpga: $(BIN).fpga
 report: $(BIN).a 
@@ -30,9 +37,14 @@ report: $(BIN).a
 $(BIN): $(SRC) $(HDR) | bin
 	$(CXX) $(CXXFLAGS) -o $@ $(SRC)
 
+$(BIN).gpu: $(SRC) $(HDR) | bin
+	$(CXX) $(CXXFLAGS) -DGPU=1 -o $@ $(SRC)
+
 $(BIN).fpga_emu: $(SRC) $(HDR) | bin
 	$(CXX) $(CXXFLAGS) -fintelfpga $< -o $@ -DFPGA_EMULATOR=1
 
+# To reuse fpga image add: -reuse-exe=$(BIN).fpga
+# To add profiling info do:  -Xsprofile
 $(BIN).fpga: $(BIN).dev.o | bin
 	$(CXX) $(CXXFLAGS) -fintelfpga $< -o $@ -Xshardware
 

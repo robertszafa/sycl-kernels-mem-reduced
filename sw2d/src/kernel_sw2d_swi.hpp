@@ -11,7 +11,7 @@
 
 using namespace sycl;
 
-void sw2d_reduced(queue &q, const std::vector<int> &wet, const std::vector<float> &eta,
+double sw2d_swi(queue &q, const std::vector<int> &wet, const std::vector<float> &eta,
                 const std::vector<float> &u, const std::vector<float> &v,
                 const std::vector<float> &h, std::vector<float> &etann, std::vector<float> &un,
                 std::vector<float> &vn) {
@@ -337,4 +337,9 @@ void sw2d_reduced(queue &q, const std::vector<int> &wet, const std::vector<float
 
   });
 
+  auto start = event_first.get_profiling_info<info::event_profiling::command_start>();
+  auto end = event_last.get_profiling_info<info::event_profiling::command_end>();
+  double time_in_ms = static_cast<double>(end - start) / 1000000;
+
+  return time_in_ms;
 }
