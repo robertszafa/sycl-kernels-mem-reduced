@@ -80,14 +80,14 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
   using etan_pipe_map75_smache_j_km1 = pipe<class etan_pipe_map75_smache_j_km1_class, float>;
   using etan_pipe_map75_smache_jm1_k = pipe<class etan_pipe_map75_smache_jm1_k_class, float>;
 
-  q.submit([&](handler &hnd) {
+  auto event_first = q.submit([&](handler &hnd) {
     accessor h(h_buf, hnd, read_only);
     accessor u(u_buf, hnd, read_only);
     accessor v(v_buf, hnd, read_only);
     accessor eta(eta_buf, hnd, read_only);
     accessor wet(wet_buf, hnd, read_only);
 
-    hnd.single_task<class memrd_smache>([=]() {
+    hnd.single_task<class memrd_smache>([=]() [[intel::kernel_args_restrict]] {
       constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
       constexpr uint REACH_NEG = 0;
       constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
@@ -142,7 +142,7 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
     accessor un(un_buf, hnd, write_only, no_init);
     accessor vn(vn_buf, hnd, write_only, no_init);
 
-    hnd.single_task<class map49_55>([=]() {
+    hnd.single_task<class map49_55>([=]() [[intel::kernel_args_restrict]] {
       for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
         const auto h_j_k = h_pipe_memrd_j_k::read();
         const auto u_j_k = u_pipe_memrd_j_k::read();
@@ -188,7 +188,7 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
   });
 
   q.submit([&](handler &hnd) {
-    hnd.single_task<class map55_smache>([=]() {
+    hnd.single_task<class map55_smache>([=]() [[intel::kernel_args_restrict]] {
       constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
       constexpr uint REACH_NEG = std::max(OFFSET_J_KM1, OFFSET_JM1_K);
       constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
@@ -246,7 +246,7 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
   });
 
   q.submit([&](handler &hnd) {
-    hnd.single_task<class map75>([=]() {
+    hnd.single_task<class map75>([=]() [[intel::kernel_args_restrict]] {
       for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
         const auto vn_j_k = vn_pipe_map55_smache_j_k::read();
         const auto vn_j_km1 = vn_pipe_map55_smache_j_km1::read();
@@ -287,7 +287,7 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
     accessor wet(wet_buf, hnd, read_only);
     accessor eta(eta_buf, hnd, read_only);
 
-    hnd.single_task<class map75_smache>([=]() {
+    hnd.single_task<class map75_smache>([=]() [[intel::kernel_args_restrict]] {
       constexpr uint REACH_POS = std::max(OFFSET_J_KP1, OFFSET_JP1_K);
       constexpr uint REACH_NEG = std::max(OFFSET_J_KM1, OFFSET_JM1_K);
       constexpr uint STENCIL_REACH = REACH_NEG + REACH_POS;
@@ -329,10 +329,10 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
     });
   });
 
-  q.submit([&](handler &hnd) {
+  auto event_last = q.submit([&](handler &hnd) {
     accessor etann(etann_buf, hnd, write_only, no_init);
 
-    hnd.single_task<class map92>([=]() {
+    hnd.single_task<class map92>([=]() [[intel::kernel_args_restrict]] {
       for (int global_id = 0; global_id < ARRAY_SIZE; ++global_id) {
 
         auto etan_j_k = etan_pipe_map75_smache_j_k::read();

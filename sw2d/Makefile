@@ -6,7 +6,7 @@ ifndef NY
 NY := 500
 endif
 ifndef KERNEL
-KERNEL := reduced
+KERNEL := swi_reduced
 endif
 
 # NUM_CU is the unroll factor for the swi_reduced kernel top level loop. Compute units

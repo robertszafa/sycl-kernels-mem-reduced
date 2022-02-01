@@ -34,13 +34,13 @@ double sw2d_ndrange(queue &q, const std::vector<int> &wet, const std::vector<flo
   buffer<float> etan_buf(array_range);
 
   // Submit kernels in-order to the same blocking queue.
-  q.submit([&](handler &hnd) {
+  auto event_first = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
     accessor eta(eta_buf, hnd, read_only);
     accessor du___dyn(du___dyn_buf, hnd, write_only, no_init);
     accessor dv___dyn(dv___dyn_buf, hnd, write_only, no_init);
 
-    hnd.parallel_for<class map49>(DOMAIN_SIZE, [=](id<1> item_id) {
+    hnd.parallel_for<class map49>(DOMAIN_SIZE, [=](id<1> item_id) [[intel::kernel_args_restrict]] {
       const uint global_id = item_id + 1;
       const uint j_range = ((NX - 1) + 1);
       const uint k_range = ((NY - 1) + 1);
@@ -186,7 +186,7 @@ double sw2d_ndrange(queue &q, const std::vector<int> &wet, const std::vector<flo
     });
   });
 
-  q.submit([&](handler &hnd) {
+  auto event_last = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
     accessor wet(wet_buf, hnd, read_only);
     accessor etan(etan_buf, hnd, read_only);

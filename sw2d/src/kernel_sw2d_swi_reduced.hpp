@@ -41,10 +41,10 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
     hnd.single_task<class sw2d_superkernel>([=]() [[intel::kernel_args_restrict]] {
 #pragma unroll NUM_CU
 #if FPGA || FPGA_EMULATOR
-    // ivdep allows the fpga compiler to achieve II=1 when loop is unrolled by letting it know
-    // that there are no memory dependencies across loop iterations.
-    // This attribute only works when compiling for FPGAs
-    [[intel::ivdep]] 
+      // ivdep allows the fpga compiler to achieve II=1 when loop is unrolled by letting it know
+      // that there are no memory dependencies across loop iterations.
+      // This attribute only works when compiling for FPGAs
+      [[intel::ivdep]]
 #endif
       for (int global_id = 1; global_id < DOMAIN_SIZE; ++global_id) {
 
@@ -94,13 +94,10 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
         float etan_s_0___f_comp_etann_1_16[5];
 
         // THESE OFFSETS ARE HARDCODED FOR SQUARE DOMAINS ONLY
-        const int s1[] = {NX+3, NX+4, NX*2+5};
-        const int s3[] = {1, NX+3};
-        const int s5[] = {1, NX+2, NX+3, NX+4, NX*2+4};
+        const int s1[] = {NX + 3, NX + 4, NX * 2 + 5};
+        const int s3[] = {1, NX + 3};
+        const int s5[] = {1, NX + 2, NX + 3, NX + 4, NX * 2 + 4};
 
-        int s_idx_1;
-        int s_idx_2;
-        int s_idx_3;
         float svec_etann_1_17[10];
         float svec_etann_1_18[30];
         float svec_etann_1_20[10];
@@ -108,18 +105,24 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
         float eta_s_0[3];
         int wet_s_0[3];
         //  RF4A Begin Inline
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
           wet_s_1[F1D2C(1, s_idx_1)] = wet_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)])];
         }
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
-          for (s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+          for (int s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
             svec_etann_1_17[F2D2C(((5 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
                 u_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)] + s3[F1D2C(1, s_idx_2)])];
           }
         }
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
-          for (s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
-            for (s_idx_3 = 1; s_idx_3 <= 3; s_idx_3 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+          for (int s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
+#pragma unroll
+            for (int s_idx_3 = 1; s_idx_3 <= 3; s_idx_3 += 1) {
               svec_etann_1_18[F3D2C(((5 - 1) + 1), ((2 - 1) + 1), 1, 1, 1, s_idx_1, s_idx_2,
                                     s_idx_3)] =
                   eta_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)] + s3[F1D2C(1, s_idx_2)] +
@@ -127,9 +130,12 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
             }
           }
         }
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
-          for (s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
-            for (s_idx_3 = 1; s_idx_3 <= 3; s_idx_3 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+          for (int s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
+#pragma unroll
+            for (int s_idx_3 = 1; s_idx_3 <= 3; s_idx_3 += 1) {
               svec_etann_1_19[F3D2C(((5 - 1) + 1), ((2 - 1) + 1), 1, 1, 1, s_idx_1, s_idx_2,
                                     s_idx_3)] =
                   wet_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)] + s3[F1D2C(1, s_idx_2)] +
@@ -137,23 +143,30 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
             }
           }
         }
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
-          for (s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+          for (int s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
             svec_etann_1_20[F2D2C(((5 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
                 v_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)] + s3[F1D2C(1, s_idx_2)])];
           }
         }
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
-          for (s_idx_2 = 1; s_idx_2 <= 5; s_idx_2 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+          for (int s_idx_2 = 1; s_idx_2 <= 5; s_idx_2 += 1) {
             svec_etann_1_21[F2D2C(((5 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
                 h_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)] + s5[F1D2C(1, s_idx_2)])];
           }
         }
-        for (s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 5; s_idx_1 += 1) {
           svec_etann_1_26[F1D2C(1, s_idx_1)] = eta_0[F1D2C(1, global_id + s5[F1D2C(1, s_idx_1)])];
         }
-        for (i___f_maps_etann_1_13 = 1; i___f_maps_etann_1_13 <= 5; i___f_maps_etann_1_13 += 1) {
-          for (i___f_maps_etann_1_5 = 1; i___f_maps_etann_1_5 <= 2; i___f_maps_etann_1_5 += 1) {
+#pragma unroll
+        for (int i___f_maps_etann_1_13 = 1; i___f_maps_etann_1_13 <= 5; i___f_maps_etann_1_13 += 1) {
+#pragma unroll
+          for (int i___f_maps_etann_1_5 = 1; i___f_maps_etann_1_5 <= 2; i___f_maps_etann_1_5 += 1) {
             sv_u_0_in___f_comp_etann_1_6[F1D2C(1, i___f_maps_etann_1_5)] = svec_etann_1_17[F2D2C(
                 ((5 - 1) + 1), 1, 1, i___f_maps_etann_1_13, i___f_maps_etann_1_5)];
             sv_du___dyn_1_in[F1D2C(1, i___f_maps_etann_1_5)] =
@@ -164,7 +177,8 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
                                         i___f_maps_etann_1_13, i___f_maps_etann_1_5, 1)]) /
                 dx___dyn_shapiro_map_49_scal;
           }
-          for (i___f_maps_etann_1_2 = 1; i___f_maps_etann_1_2 <= 2; i___f_maps_etann_1_2 += 1) {
+#pragma unroll
+          for (int i___f_maps_etann_1_2 = 1; i___f_maps_etann_1_2 <= 2; i___f_maps_etann_1_2 += 1) {
             if (svec_etann_1_19[F2D2C(((2 - 1) + 1), 1, 1, i___f_maps_etann_1_2, 1)] == 1) {
               if ((svec_etann_1_19[F2D2C(((2 - 1) + 1), 1, 1, i___f_maps_etann_1_2, 3)] == 1) ||
                   (sv_du___dyn_1_in[F1D2C(1, i___f_maps_etann_1_2)] > 0.0))
@@ -181,7 +195,8 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
                     sv_du___dyn_1_in[F1D2C(1, i___f_maps_etann_1_2)];
             }
           }
-          for (i___f_maps_etann_1_10 = 1; i___f_maps_etann_1_10 <= 2; i___f_maps_etann_1_10 += 1) {
+#pragma unroll
+          for (int i___f_maps_etann_1_10 = 1; i___f_maps_etann_1_10 <= 2; i___f_maps_etann_1_10 += 1) {
             sv_dv___dyn_1_in[F1D2C(1, i___f_maps_etann_1_10)] =
                 -dt___dyn_shapiro_map_49_scal * g___dyn_shapiro_map_49_scal *
                 (&svec_etann_1_18[F3D2C(((5 - 1) + 1), ((2 - 1) + 1), 1, 1, 1,
@@ -192,7 +207,8 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
             sv_v_0_in___f_comp_etann_1_11[F1D2C(1, i___f_maps_etann_1_10)] = svec_etann_1_20[F2D2C(
                 ((5 - 1) + 1), 1, 1, i___f_maps_etann_1_13, i___f_maps_etann_1_10)];
           }
-          for (i___f_maps_etann_1_8 = 1; i___f_maps_etann_1_8 <= 2; i___f_maps_etann_1_8 += 1) {
+#pragma unroll
+          for (int i___f_maps_etann_1_8 = 1; i___f_maps_etann_1_8 <= 2; i___f_maps_etann_1_8 += 1) {
             if (svec_etann_1_19[F2D2C(((2 - 1) + 1), 1, 1, i___f_maps_etann_1_8, 1)] == 1) {
               if ((svec_etann_1_19[F2D2C(((2 - 1) + 1), 1, 1, i___f_maps_etann_1_8, 2)] == 1) ||
                   (sv_dv___dyn_1_in[F1D2C(1, i___f_maps_etann_1_8)] > 0.0))
@@ -212,7 +228,8 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
           sv_eta_0_in___f_comp_etann_1_14[F1D2C(1, i___f_maps_etann_1_13)] =
               svec_etann_1_26[F1D2C(1, i___f_maps_etann_1_13)];
         }
-        for (i___f_maps_etann_1_0 = 1; i___f_maps_etann_1_0 <= 5; i___f_maps_etann_1_0 += 1) {
+#pragma unroll
+        for (int i___f_maps_etann_1_0 = 1; i___f_maps_etann_1_0 <= 5; i___f_maps_etann_1_0 += 1) {
           hep___dyn = 0.5 *
                       (sv_un_s_0_in___f_comp____2871b75d[F2D2C(((5 - 1) + 1), 1, 1,
                                                                i___f_maps_etann_1_0, 2)] +
@@ -286,10 +303,12 @@ double sw2d_swi_reduced(queue &q, const std::vector<int> &wet, const std::vector
         } else {
           etann_1[F1D2C(1, global_id)] = etan_s_0___f_comp_etann_1_16[F1D2C(1, 3)];
         }
-        for (s_idx_1 = 1; s_idx_1 <= 3; s_idx_1 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 3; s_idx_1 += 1) {
           eta_s_0[F1D2C(1, s_idx_1)] = eta_0[F1D2C(1, global_id + s1[F1D2C(1, s_idx_1)])];
         }
-        for (s_idx_1 = 1; s_idx_1 <= 3; s_idx_1 += 1) {
+#pragma unroll
+        for (int s_idx_1 = 1; s_idx_1 <= 3; s_idx_1 += 1) {
           wet_s_0[F1D2C(1, s_idx_1)] = wet_0[F1D2C(1, global_id + s1[F1D2C(1, s_idx_1)])];
         }
         u_0___f_comp_un_1_vn_1_2 = u_0[F1D2C(1, global_id)];
