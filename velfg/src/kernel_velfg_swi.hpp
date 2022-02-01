@@ -11,10 +11,10 @@
 using namespace sycl;
 
 double velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float> &v,
-               const std::vector<float> &w, const std::vector<float> &dx1,
-               const std::vector<float> &dy1, const std::vector<float> &dzn,
-               const std::vector<float> &dzs, std::vector<float> &f, std::vector<float> &g,
-               std::vector<float> &h) {
+                 const std::vector<float> &w, const std::vector<float> &dx1,
+                 const std::vector<float> &dy1, const std::vector<float> &dzn,
+                 const std::vector<float> &dzs, std::vector<float> &f, std::vector<float> &g,
+                 std::vector<float> &h) {
 
   range<1> fgh_range{F_G_H_ARRAY_SIZE};
   range<1> uvw_range{U_V_W_ARRAY_SIZE};
@@ -43,7 +43,7 @@ double velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float>
       diu5_buf(uvw_range), diu6_buf(uvw_range), diu7_buf(uvw_range), diu8_buf(uvw_range),
       diu9_buf(uvw_range);
 
-  
+
   // Submit kernels in-order to the same blocking queue.
   sycl::event event_first = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
@@ -76,28 +76,30 @@ double velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float>
 
     // map 76
     hnd.single_task<class map76_133>([=]() [[intel::kernel_args_restrict]] {
-      float nou1[U_V_W_ARRAY_SIZE];
-      float nou2[U_V_W_ARRAY_SIZE];
-      float nou3[U_V_W_ARRAY_SIZE];
-      float nou4[U_V_W_ARRAY_SIZE];
-      float nou5[U_V_W_ARRAY_SIZE];
-      float nou6[U_V_W_ARRAY_SIZE];
-      float nou7[U_V_W_ARRAY_SIZE];
-      float nou8[U_V_W_ARRAY_SIZE];
-      float nou9[U_V_W_ARRAY_SIZE];
-
-      const int u0 = 0;
-      int i_vel2;
-      int j_vel2;
-      int k_vel2;
-      int k_vel2_range;
-      int j_vel2_range;
-      int i_vel2_range;
-      int k_vel2_rel;
-      int j_vel2_rel;
-      int i_vel2_rel;
-
+#if FPGA || FPGA_EMULATOR
+      [[intel::ivdep]]
+#endif
       for (int global_id = 1; global_id < DOMAIN_SIZE; ++global_id) {
+        float nou1[U_V_W_ARRAY_SIZE];
+        float nou2[U_V_W_ARRAY_SIZE];
+        float nou3[U_V_W_ARRAY_SIZE];
+        float nou4[U_V_W_ARRAY_SIZE];
+        float nou5[U_V_W_ARRAY_SIZE];
+        float nou6[U_V_W_ARRAY_SIZE];
+        float nou7[U_V_W_ARRAY_SIZE];
+        float nou8[U_V_W_ARRAY_SIZE];
+        float nou9[U_V_W_ARRAY_SIZE];
+
+        const int u0 = 0;
+        int i_vel2;
+        int j_vel2;
+        int k_vel2;
+        int k_vel2_range;
+        int j_vel2_range;
+        int i_vel2_range;
+        int k_vel2_rel;
+        int j_vel2_rel;
+        int i_vel2_rel;
 
         k_vel2_range = (((KP + 1) - 1) + 1);
         j_vel2_range = ((JP - 1) + 1);
@@ -277,11 +279,9 @@ double velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float>
                        k_vel2)] *
             diu8[F3D2C((((IP + 2) - 0) + 1), (((JP + 2) - 0) + 1), 0, 0, 0, i_vel2, j_vel2,
                        k_vel2)];
-
       }
     });
   });
-
 
   sycl::event event_last = q.submit([&](handler &hnd) {
     // stream debug(1024, 256, hnd);
@@ -318,28 +318,30 @@ double velfg_swi(queue &q, const std::vector<float> &u, const std::vector<float>
 
     // map 218
     hnd.single_task<class map218>([=]() [[intel::kernel_args_restrict]] {
-      float dfu1[U_V_W_ARRAY_SIZE];
-      float dfv1[U_V_W_ARRAY_SIZE];
-      float dfw1[U_V_W_ARRAY_SIZE];
-
-      const float vn = 15.83 * 0.000001;
-      const int u0 = 0;
-      float covx1;
-      int i;
-      int j;
-      int k;
-      float covy1;
-      float covz1;
-      float covc;
-      float df;
-      int k_range;
-      int j_range;
-      int i_range;
-      int k_rel;
-      int j_rel;
-      int i_rel;
-
+#if FPGA || FPGA_EMULATOR
+      [[intel::ivdep]]
+#endif
       for (int global_id = 1; global_id < DOMAIN_SIZE; ++global_id) {
+        float dfu1[U_V_W_ARRAY_SIZE];
+        float dfv1[U_V_W_ARRAY_SIZE];
+        float dfw1[U_V_W_ARRAY_SIZE];
+
+        const float vn = 15.83 * 0.000001;
+        const int u0 = 0;
+        float covx1;
+        int i;
+        int j;
+        int k;
+        float covy1;
+        float covz1;
+        float covc;
+        float df;
+        int k_range;
+        int j_range;
+        int i_range;
+        int k_rel;
+        int j_rel;
+        int i_rel;
 
         k_range = ((KP - 1) + 1);
         j_range = ((JP - 1) + 1);

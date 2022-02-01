@@ -194,50 +194,56 @@ double velfg_ndrange_reduced(queue &q, const std::vector<float> &u, const std::v
 
       //    !RF4A Begin Inline
     #pragma unroll
-      for (s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
-        for (s_idx_2 = 1; s_idx_2 <= 5; s_idx_2 += 1) {
+      for (int s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
+    #pragma unroll
+        for (int s_idx_2 = 1; s_idx_2 <= 5; s_idx_2 += 1) {
           svec_f_1_g_1_h_1_17[F2D2C(((2 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
               u_0[F1D2C(1, global_id + s8[F1D2C(1, s_idx_1)] + s3[F1D2C(1, s_idx_2)])];
         }
       }
     #pragma unroll
-      for (s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
-        for (s_idx_2 = 1; s_idx_2 <= 5; s_idx_2 += 1) {
+      for (int s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
+    #pragma unroll
+        for (int s_idx_2 = 1; s_idx_2 <= 5; s_idx_2 += 1) {
           svec_f_1_g_1_h_1_18[F2D2C(((2 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
               v_0[F1D2C(1, global_id + s8[F1D2C(1, s_idx_1)] + s2[F1D2C(1, s_idx_2)])];
         }
       }
     #pragma unroll
-      for (s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
-        for (s_idx_2 = 1; s_idx_2 <= 4; s_idx_2 += 1) {
+      for (int s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
+    #pragma unroll
+        for (int s_idx_2 = 1; s_idx_2 <= 4; s_idx_2 += 1) {
           svec_f_1_g_1_h_1_19[F2D2C(((2 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
               w_0[F1D2C(1, global_id + s8[F1D2C(1, s_idx_1)] + s1[F1D2C(1, s_idx_2)])];
         }
       }
     #pragma unroll
-      for (s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
-        for (s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
+      for (int s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
+    #pragma unroll
+        for (int s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
           svec_f_1_g_1_h_1_32[F2D2C(((2 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
               u_0[F1D2C(1, global_id + s11[F1D2C(1, s_idx_1)] + s4[F1D2C(1, s_idx_2)])];
         }
       }
     #pragma unroll
-      for (s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
-        for (s_idx_2 = 1; s_idx_2 <= 3; s_idx_2 += 1) {
+      for (int s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
+    #pragma unroll
+        for (int s_idx_2 = 1; s_idx_2 <= 3; s_idx_2 += 1) {
           svec_f_1_g_1_h_1_33[F2D2C(((2 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
               w_0[F1D2C(1, global_id + s11[F1D2C(1, s_idx_1)] + s6[F1D2C(1, s_idx_2)])];
         }
       }
     #pragma unroll
-      for (s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
-        for (s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
+      for (int s_idx_1 = 1; s_idx_1 <= 2; s_idx_1 += 1) {
+    #pragma unroll
+        for (int s_idx_2 = 1; s_idx_2 <= 2; s_idx_2 += 1) {
           svec_f_1_g_1_h_1_34[F2D2C(((2 - 1) + 1), 1, 1, s_idx_1, s_idx_2)] =
               v_0[F1D2C(1, global_id + s11[F1D2C(1, s_idx_1)] + s5[F1D2C(1, s_idx_2)])];
         }
       }
 
       #pragma unroll
-      for (i___f_maps_f_1_g_1_h_1_1 = 1; i___f_maps_f_1_g_1_h_1_1 <= 2;
+      for (int i___f_maps_f_1_g_1_h_1_1 = 1; i___f_maps_f_1_g_1_h_1_1 <= 2;
            i___f_maps_f_1_g_1_h_1_1 += 1) {
         const int j_vel2_range___velfg_m___4b6e60e4 = ((10 - 1) + 1);
         const int i_vel2_range___velfg_m___ea66ec4a = ((10 - 1) + 1);
