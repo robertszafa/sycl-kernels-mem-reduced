@@ -4,13 +4,14 @@ import os
 SIZES = [
     '1000x1000', 
     '5000x5000', 
+    '7500x7500', 
     '10000x10000', 
     '12500x12500', 
     '15000x15000', 
     ]
 
 FLFLAGS = ['-Ofast','-flto', '-Wall','-cpp','-m64','-ffree-form','-ffree-line-length-0',
-           '-fconvert=little-endian','-frecord-marker=4', '-mcmodel=medium', '-fopenmp -g']
+           '-fconvert=little-endian','-frecord-marker=4', '-mcmodel=medium', '-fopenmp']
 
 # For the serial version I'm still using omp timers but just omit the paralled do loop pragma.
 # The below flag adds the parallel loop pragma.

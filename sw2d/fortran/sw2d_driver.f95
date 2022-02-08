@@ -13,18 +13,18 @@ program main
    real, parameter :: eps = 0.05
    real, parameter :: hmin = 0.05
 
-   integer, dimension(0:(ny + 1), 0:(nx + 1)) :: wet
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: eta
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: u
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: v
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: h
-
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: etann
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: un
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: vn
-
-   real, dimension(0:(ny + 1), 0:(nx + 1)) :: hzero
-   real :: tmp
+   integer, allocatable :: wet(:, :)
+   real, allocatable :: eta(:, :)
+   real, allocatable :: u(:, :)
+   real, allocatable :: v(:, :)
+   real, allocatable :: h(:, :)
+   real, allocatable :: etann(:, :)
+   real, allocatable :: un(:, :)
+   real, allocatable :: vn(:, :)
+   real, allocatable :: hzero(:, :)
+   real, allocatable :: du___dyn(:, :)
+   real, allocatable  :: dv___dyn(:, :)
+   real, allocatable  :: etan(:, :)
 
    integer :: state_idx, j, k
    integer, parameter :: ST_DYN_SHAPIRO_MAP_49 = 0 !  dyn_shapiro_map_49
@@ -32,6 +32,19 @@ program main
    integer, parameter :: ST_DYN_SHAPIRO_MAP_75 = 2 !  dyn_shapiro_map_75
    integer, parameter :: ST_DYN_SHAPIRO_MAP_92 = 3 !  dyn_shapiro_map_92
    real(kind=8), dimension(0:1) :: timestamp
+
+   allocate (wet(0:(ny + 1), 0:(nx + 1)))
+   allocate (eta(0:(ny + 1), 0:(nx + 1)))
+   allocate (u(0:(ny + 1), 0:(nx + 1)))
+   allocate (v(0:(ny + 1), 0:(nx + 1)))
+   allocate (h(0:(ny + 1), 0:(nx + 1)))
+   allocate (etann(0:(ny + 1), 0:(nx + 1)))
+   allocate (un(0:(ny + 1), 0:(nx + 1)))
+   allocate (vn(0:(ny + 1), 0:(nx + 1)))
+   allocate (hzero(0:(ny + 1), 0:(nx + 1)))
+   allocate (du___dyn(0:(ny + 1), 0:(nx + 1)))
+   allocate (dv___dyn(0:(ny + 1), 0:(nx + 1)))
+   allocate (etan(0:(ny + 1), 0:(nx + 1)))
 
 ! INITIALISATION -------------------------------------------------
 ! initial conditions
@@ -54,9 +67,8 @@ program main
 
    DO j = 0, ny + 1
    DO k = 0, nx + 1
-      tmp = min(0.0, hzero(j, k))
-      eta(j, k) = -tmp
-      etann(j, k) = -tmp
+      eta(j, k) = -min(0.0, hzero(j, k))
+      etann(j, k) = -min(0.0, hzero(j, k))
    END DO
    END DO
 !XXXXXXXXXXXXXXXXXXX
@@ -69,7 +81,7 @@ program main
 !$OMP PARALLEL DO PRIVATE(global_id)
 #endif
       do global_id = 1, NX*NY - 1
-         call dyn_shapiro_superkernel(wet, eta, u, v, h, etann, un, vn, state_idx, global_id)
+         call dyn_shapiro_superkernel(wet, eta, u, v, h, etann, un, vn, du___dyn, dv___dyn, etan, state_idx, global_id)
       end do
 #ifdef WITH_OPENMP
 !$OMP BARRIER

@@ -195,7 +195,7 @@ contains
 
    end subroutine dyn_shapiro_map_92
 
-   subroutine dyn_shapiro_superkernel(wet, eta, u, v, h, etann, un, vn, state, global_id)
+   subroutine dyn_shapiro_superkernel(wet, eta, u, v, h, etann, un, vn, du___dyn, dv___dyn, etan, state, global_id)
       integer, parameter :: nx = NX
       integer, parameter :: ny = NY
       real, parameter :: g = 9.81
@@ -209,15 +209,15 @@ contains
       real, dimension(0:(ny + 1), 0:(nx + 1)), intent(In) :: u
       real, dimension(0:(ny + 1), 0:(nx + 1)), intent(In) :: v
       real, dimension(0:(ny + 1), 0:(nx + 1)), intent(In) :: h
+      real, dimension(0:(ny + 1), 0:(nx + 1)), intent(InOut) :: du___dyn
+      real, dimension(0:(ny + 1), 0:(nx + 1)), intent(InOut) :: dv___dyn
+      real, dimension(0:(ny + 1), 0:(nx + 1)), intent(InOut) :: etan
       integer, intent(In) :: global_id
       integer, intent(In) :: state
 
       real, dimension(0:(ny + 1), 0:(nx + 1)), intent(Out) :: etann
       real, dimension(0:(ny + 1), 0:(nx + 1)), intent(Out) :: un
       real, dimension(0:(ny + 1), 0:(nx + 1)), intent(Out) :: vn
-      real, dimension(0:(ny + 1), 0:(nx + 1)):: du___dyn
-      real, dimension(0:(ny + 1), 0:(nx + 1)) :: dv___dyn
-      real, dimension(0:(ny + 1), 0:(nx + 1)) :: etan
 
       integer, parameter :: ST_DYN_SHAPIRO_MAP_49 = 0 !  dyn_shapiro_map_49
       integer, parameter :: ST_DYN_SHAPIRO_MAP_55 = 1 !  dyn_shapiro_map_55
