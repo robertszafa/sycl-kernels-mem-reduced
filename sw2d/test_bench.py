@@ -39,6 +39,9 @@ SIZES = [
 
 # Found in report.htlm under area. The numbers seems to be stable, inrespective of kernel source.
 BRAM_STATIC_PARTITION = 492
+ALMS_STATIC_PARTITION = 89975 # In report this is 'Logic utilization'
+REGISTERS_STATIC_PARTITION = 98940
+DSP_STATIC_PARTITION = 123
 
 CPU_DEVICE = 'Intel(R) Xeon(R) Gold 6128 CPU 6 cores @ 3.40GHz'
 
@@ -53,6 +56,9 @@ if __name__ == "__main__":
     total_time_data = []
     throughput_data = []
     ram_usage_data = []
+    alm_usage_data = []
+    reg_usage_data = []
+    dsp_usage_data = []
     freq_data = []
 
     for kernel_type in KERNEL_TYPES:
@@ -60,6 +66,9 @@ if __name__ == "__main__":
         total_times = [kernel_type]
         kernel_throughput = [kernel_type]
         kernel_ram_usage = [kernel_type]
+        kernel_alm_usage = [kernel_type]
+        kernel_reg_usage = [kernel_type]
+        kernel_dsp_usage = [kernel_type]
         kernel_freq = [kernel_type]
 
         for size in SIZES:
@@ -107,25 +116,38 @@ if __name__ == "__main__":
                 if not os.path.isfile(report):
                     print(report + " doesn't exist. Skipping resource usage..")
                     kernel_ram_usage.append('N/A')
+                    kernel_alm_usage.append('N/A')
+                    kernel_reg_usage.append('N/A')
+                    kernel_dsp_usage.append('N/A')
+                    kernel_freq.append('N/A')
                 else:
                     with open(report, 'r') as report_f:
                         report_str = report_f.read()
 
                     ram_usage_str = re.findall("RAM blocks: (.*?)/", report_str)
+                    alm_usage_str = re.findall("Logic utilization: (.*?)/", report_str)
+                    reg_usage_str = re.findall("Registers: ([,\d]+)", report_str)
+                    dsp_usage_str = re.findall("DSP blocks: (.*?)/", report_str)
                     freq_str = re.findall("Actual clock freq: (\d+)", report_str)
 
                     rams = 0
+                    alms = 0
+                    regs = 0
+                    dsps = 0
                     freq = 0
                     try:
                         rams = int(re.sub("[^0-9]", "", ram_usage_str[0])) - BRAM_STATIC_PARTITION
-                    except:
-                        print('Something went wrong with  getting ram usage from ' + report + ". Skipping..")
-                    try:
+                        alms = int(re.sub("[^0-9]", "", alm_usage_str[0])) - ALMS_STATIC_PARTITION
+                        regs = int(re.sub("[^0-9]", "", reg_usage_str[0])) - REGISTERS_STATIC_PARTITION
+                        dsps = int(re.sub("[^0-9]", "", dsp_usage_str[0])) - DSP_STATIC_PARTITION
                         freq = freq_str[0]
-                    except:
-                        print('Something went wrong with getting freq from ' + report + ". Skipping..")
+                    except Exception as e:
+                        print('Something went wrong with  getting ram usage from ' + report + ". Skipping.." + str(e))
 
                     kernel_ram_usage.append(rams)
+                    kernel_alm_usage.append(alms)
+                    kernel_reg_usage.append(regs)
+                    kernel_dsp_usage.append(dsps)
                     kernel_freq.append(freq)
 
         
@@ -133,6 +155,9 @@ if __name__ == "__main__":
         total_time_data.append(total_times)
         throughput_data.append(kernel_throughput)
         ram_usage_data.append(kernel_ram_usage)
+        alm_usage_data.append(kernel_alm_usage)
+        reg_usage_data.append(kernel_reg_usage)
+        dsp_usage_data.append(kernel_dsp_usage)
         freq_data.append(kernel_freq)
 
 
@@ -149,9 +174,24 @@ if __name__ == "__main__":
         writer.writerows(throughput_data)
 
         writer.writerow([""])
-        writer.writerow(["BRAMs (only kernel system, SYCL takes 492)"])
+        writer.writerow([f"BRAMs (only kernel system, SYCL takes {BRAM_STATIC_PARTITION})"])
         writer.writerow(header)
         writer.writerows(ram_usage_data)
+
+        writer.writerow([""])
+        writer.writerow([f"ALMs (only kernel system, SYCL takes {ALMS_STATIC_PARTITION})"])
+        writer.writerow(header)
+        writer.writerows(alm_usage_data)
+
+        writer.writerow([""])
+        writer.writerow([f"REGs (only kernel system, SYCL takes {REGISTERS_STATIC_PARTITION})"])
+        writer.writerow(header)
+        writer.writerows(reg_usage_data)
+
+        writer.writerow([""])
+        writer.writerow([f"DSPs (only kernel system, SYCL takes {DSP_STATIC_PARTITION})"])
+        writer.writerow(header)
+        writer.writerows(dsp_usage_data)
 
         writer.writerow([""])
         writer.writerow(["Frequency (MHz)"])
