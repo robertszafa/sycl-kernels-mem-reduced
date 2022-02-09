@@ -14,19 +14,19 @@ KERNEL_TYPES = [
     'ndrange_reduced', 
     'swi', 
     'swi_reduced_1cu', 
-    'swi_reduced_2cu', 
-    'swi_reduced_3cu', 
-    'swi_reduced_4cu', 
-    'swi_reduced_5cu', 
-    'swi_reduced_6cu', 
-    'fortran',
-    'fortran_omp',
-    'cpu_swi',
-    'cpu_swi_reduced',
-    'cpu_ndrange',
-    'cpu_ndrange_reduced',
-    'gpu_ndrange',
-    'gpu_ndrange_reduced',
+    # 'swi_reduced_2cu', 
+    # 'swi_reduced_3cu', 
+    # 'swi_reduced_4cu', 
+    # 'swi_reduced_5cu', 
+    # 'swi_reduced_6cu', 
+    # 'fortran',
+    # 'fortran_omp',
+    # 'cpu_swi',
+    # 'cpu_swi_reduced',
+    # 'cpu_ndrange',
+    # 'cpu_ndrange_reduced',
+    # 'gpu_ndrange',
+    # 'gpu_ndrange_reduced',
     ]
 SIZES = [
     '1000x1000', 
@@ -41,7 +41,7 @@ SIZES = [
 BRAM_STATIC_PARTITION = 492
 ALMS_STATIC_PARTITION = 89975 # In report this is 'Logic utilization'
 REGISTERS_STATIC_PARTITION = 98940
-DSP_STATIC_PARTITION = 123
+DSP_STATIC_PARTITION = 0
 
 CPU_DEVICE = 'Intel(R) Xeon(R) Gold 6128 CPU 6 cores @ 3.40GHz'
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
             print(f'Running {binary} {REPEAT} times...')
             
-            if not os.path.isfile(binary):
+            if not os.path.isfile(binary) or True:
                 print(binary + " doesn't exist. Skipping time test..")
                 kernel_times.append('N/A')
                 total_times.append('N/A')
