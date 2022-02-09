@@ -3,7 +3,6 @@ import os
 import re
 
 REPEAT = 1
-NOT_RUN = True
 
 RESULTS_FILE = 'results_velfg.csv'
 
@@ -92,7 +91,7 @@ if __name__ == "__main__":
 
             print(f'Running {binary} {REPEAT} times...')
             
-            if not os.path.isfile(binary) or NOT_RUN:
+            if not os.path.isfile(binary):
                 print(binary + " doesn't exist. Skipping time test..")
                 kernel_times.append('N/A')
                 total_times.append('N/A')

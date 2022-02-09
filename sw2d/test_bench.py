@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
             print(f'Running {binary} {REPEAT} times...')
             
-            if not os.path.isfile(binary) or True:
+            if not os.path.isfile(binary):
                 print(binary + " doesn't exist. Skipping time test..")
                 kernel_times.append('N/A')
                 total_times.append('N/A')
