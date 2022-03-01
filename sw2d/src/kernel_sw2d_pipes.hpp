@@ -56,11 +56,11 @@ double sw2d_pipes(queue &q, const std::vector<int> &wet, const std::vector<float
   using h_pipe_map55_smache_j_km1 = pipe<class h_pipe_map55_smache_j_km1_class, float>;
   using h_pipe_map55_smache_jm1_k = pipe<class h_pipe_map55_smache_jm1_k_class, float>;
   using vn_pipe_map55_smache_j_k = pipe<class vn_pipe_map55_smache_j_k_class, float>;
-  using vn_pipe_map55_smache_j_km1 = pipe<class vn_pipe_map55_smache_j_k_class, float>;
-  using vn_pipe_map55_smache_jm1_k = pipe<class vn_pipe_map55_smache_j_k_class, float>;
-  using un_pipe_map55_smache_j_k = pipe<class vn_pipe_map55_smache_j_k_class, float>;
-  using un_pipe_map55_smache_j_km1 = pipe<class vn_pipe_map55_smache_j_k_class, float>;
-  using un_pipe_map55_smache_jm1_k = pipe<class vn_pipe_map55_smache_j_k_class, float>;
+  using vn_pipe_map55_smache_j_km1 = pipe<class vn_pipe_map55_smache_j_km1_class, float>;
+  using vn_pipe_map55_smache_jm1_k = pipe<class vn_pipe_map55_smache_jm1_k_class, float>;
+  using un_pipe_map55_smache_j_k = pipe<class un_pipe_map55_smache_j_k_class, float>;
+  using un_pipe_map55_smache_j_km1 = pipe<class un_pipe_map55_smache_j_km1_class, float>;
+  using un_pipe_map55_smache_jm1_k = pipe<class un_pipe_map55_smache_jm1_k_class, float>;
   using eta_pipe_map55_smache_j_k = pipe<class eta_pipe_map55_smache_j_k_class, float>;
   using wet_pipe_map55_smache_j_k = pipe<class wet_pipe_map55_smache_j_k_class, float>;
 

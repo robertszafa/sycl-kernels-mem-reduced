@@ -260,10 +260,10 @@ double velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<floa
   //////////////////////////////
   // map 76 and map 133
   q.submit([&](handler &hnd) {
-    accessor dx1(dx1_buf, hnd, read_only);
-    accessor dy1(dy1_buf, hnd, read_only);
-    accessor dzn(dzn_buf, hnd, read_only);
-    accessor dzs(dzs_buf, hnd, read_only);
+    accessor dx1_ac(dx1_buf, hnd, read_constant);
+    accessor dy1_ac(dy1_buf, hnd, read_constant);
+    accessor dzn_ac(dzn_buf, hnd, read_constant);
+    accessor dzs_ac(dzs_buf, hnd, read_constant);
 
     hnd.single_task<class map76_133>([=]() [[intel::kernel_args_restrict]] {
       const int u0 = 0;
@@ -271,6 +271,24 @@ double velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<floa
       const int k_vel2_range = (((KP + 1) - 1) + 1);
       const int j_vel2_range = ((JP - 1) + 1);
       const int i_vel2_range = ((IP - 1) + 1);
+
+      float dx1[DX_ARRAY_SIZE];
+      float dy1[DX_ARRAY_SIZE];
+      float dzn[DZ_ARRAY_SIZE];
+      float dzs[DZ_ARRAY_SIZE];
+
+      #pragma unroll
+      for (uint idx = 0; idx < DX_ARRAY_SIZE; ++idx) 
+        dx1[idx] = dx1_ac[idx];
+      #pragma unroll
+      for (uint idx = 0; idx < DY_ARRAY_SIZE; ++idx) 
+        dy1[idx] = dy1_ac[idx];
+      #pragma unroll
+      for (uint idx = 0; idx < DZ_ARRAY_SIZE; ++idx) 
+        dzn[idx] = dzn_ac[idx];
+      #pragma unroll
+      for (uint idx = 0; idx < DZ_ARRAY_SIZE; ++idx) 
+        dzs[idx] = dzs_ac[idx];
 
       for (uint idx = 0; idx < DOMAIN_SIZE; ++idx) {
         float cov1 = 0, cov2 = 0, cov3 = 0, cov4 = 0, cov5 = 0, cov6 = 0, cov7 = 0, cov8 = 0, cov9;
@@ -531,10 +549,10 @@ double velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<floa
   //////////////////////////////
   // map 218 and write memory
   sycl::event event_last = q.submit([&](handler &hnd) {
-    accessor dx1(dx1_buf, hnd, read_only);
-    accessor dy1(dy1_buf, hnd, read_only);
-    accessor dzn(dzn_buf, hnd, read_only);
-    accessor dzs(dzs_buf, hnd, read_only);
+    accessor dx1_ac(dx1_buf, hnd, read_constant);
+    accessor dy1_ac(dy1_buf, hnd, read_constant);
+    accessor dzn_ac(dzn_buf, hnd, read_constant);
+    accessor dzs_ac(dzs_buf, hnd, read_constant);
 
     accessor f(f_buf, hnd, write_only, no_init);
     accessor g(g_buf, hnd, write_only, no_init);
@@ -546,6 +564,24 @@ double velfg_pipes(queue &q, const std::vector<float> &u, const std::vector<floa
       const int k_range = ((KP - 1) + 1);
       const int j_range = ((JP - 1) + 1);
       const int i_range = ((IP - 1) + 1);
+
+      float dx1[DX_ARRAY_SIZE];
+      float dy1[DX_ARRAY_SIZE];
+      float dzn[DZ_ARRAY_SIZE];
+      float dzs[DZ_ARRAY_SIZE];
+
+      #pragma unroll
+      for (uint idx = 0; idx < DX_ARRAY_SIZE; ++idx) 
+        dx1[idx] = dx1_ac[idx];
+      #pragma unroll
+      for (uint idx = 0; idx < DY_ARRAY_SIZE; ++idx) 
+        dy1[idx] = dy1_ac[idx];
+      #pragma unroll
+      for (uint idx = 0; idx < DZ_ARRAY_SIZE; ++idx) 
+        dzn[idx] = dzn_ac[idx];
+      #pragma unroll
+      for (uint idx = 0; idx < DZ_ARRAY_SIZE; ++idx) 
+        dzs[idx] = dzs_ac[idx];
 
       for (uint idx = 0; idx < DOMAIN_SIZE; ++idx) {
         float cov1_i_j_k = cov1_i_j_k_map76_133_2_map218_post::read();
