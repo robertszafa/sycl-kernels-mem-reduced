@@ -1,0 +1,50 @@
+############
+TIME
+############
+
+Arria 10, no sycl DCE, low fanout
+  Kernel time (ms): 8
+
+Stratix 10, no sycl DCE, high fanout
+  Kernel time (ms): 3.83
+
+Stratix 10, sycl DCE, low fanout
+  Kernel time (ms): 3.83
+  --> NO DIFFERENCE IF DCE OR FANOUT
+
+Stratix 10, unroll x4
+  Kernel time (ms): 2.87
+
+Stratix 10, unroll x2 (max bandwidth reached)
+  Kernel time (ms): 2.63
+
+
+############
+Memory usage
+############
+
+Stratic 10 BRAM capacity = 234 MBytes
+25% of that takes up the BSP, so best case scenarion 
+we have 175MBytes capacity for the kernel.
+(The tools usually fail at 90% capacity, so in reality it will be less.)
+
+The diffusion code has 16 intermediate buffers  
+  16 * 1e-6 * 4 * 80 * 128^2 = 84 MBytes 
+
+The Zurich team claims 20% BRAM usage at 128x80x128 domain. 
+This corresponds to 9 intermediate buffers at that domain:
+  9 * 1e-6 * 4 * 80 * 128^2 = 47 MBytes 
+
+Assuming 16 buffers, their approach scales to a domain of ~ 180x80x180
+  16 * 1e-6 * 4 * 80 * 180^2 = 166 MBytes 
+
+Assuming 9 buffers, their approach scales to a domain of ~ 250x80x250
+  9 * 1e-6 * 4 * 80 * 250^2 = 240 MBytes 
+
+
+Stratic 10 DRAM capacity = 32 GBytes
+There are 9 mappable arrays in global memory.
+Our approach should scale to a domain of ~ 3200x80x3200:
+  9 * 1e-9 * 4 * 80 * 3200^2 = 29.5 GBytes 
+
+BRAM usage is constant in our solution.
